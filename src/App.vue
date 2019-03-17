@@ -11,8 +11,8 @@
 <template>
   <div id="app">
     <waterfall
+      line-width="50%"
       :line-count="2"
-      :line-width="140"
       :margin-bottom="10"
       :margin-right="10"
     >

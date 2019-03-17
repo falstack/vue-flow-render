@@ -8,9 +8,11 @@
 </style>
 
 <template>
-  <div :style="style" class="waterfall-slot">
-    <slot />
-  </div>
+  <keep-alive>
+    <div v-if="display" :style="style" class="waterfall-slot">
+      <slot />
+    </div>
+  </keep-alive>
 </template>
 
 <script>
@@ -32,21 +34,15 @@ export default {
   },
   data() {
     return {
+      top: 0,
+      bottom: 0,
+      display: false,
       style: {}
     }
   },
   methods: {
     notify() {
       this.$parent.$emit('render', this)
-    },
-    getMeta() {
-      return {
-        vm: this,
-        node: this.$el,
-        index: this.index,
-        width: this.width,
-        height: this.height
-      }
     }
   },
   mounted() {
