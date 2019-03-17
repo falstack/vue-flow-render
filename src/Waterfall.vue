@@ -43,6 +43,16 @@ const throttle = (func, wait, options) => {
   }
 }
 
+const getOffsetTop = elem => {
+  let offsetTop = 0
+  do {
+    if (!isNaN(elem.offsetTop)) {
+      offsetTop += elem.offsetTop
+    }
+  } while ((elem = elem.offsetParent))
+  return offsetTop
+}
+
 const on = (elem, type, listener, useCapture = false) => {
   elem.addEventListener(type, listener, useCapture)
 }
@@ -182,7 +192,7 @@ export default {
       if (this.rectTop !== '') {
         return this.rectTop
       }
-      const top = this.$el.getBoundingClientRect().top
+      const top = getOffsetTop(this.$el)
       this.rectTop = top
       return top
     }
