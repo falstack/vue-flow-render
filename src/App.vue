@@ -5,6 +5,15 @@
     height: 100%;
     text-align: center;
   }
+
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: 0.5s;
+  }
+  .fade-enter,
+  .fade-leave-to {
+    transform: scale(0.5);
+  }
 }
 </style>
 
@@ -22,6 +31,7 @@
         :index="item.index"
         :width="item.width"
         :height="item.height"
+        transition="fade"
       >
         <div
           :style="{ backgroundColor: `${item.style.background}` }"

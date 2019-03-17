@@ -9,9 +9,11 @@
 
 <template>
   <keep-alive>
-    <div v-if="display" :style="style" class="waterfall-slot">
-      <slot />
-    </div>
+    <transition :name="transition">
+      <div v-if="display" :style="style" class="waterfall-slot">
+        <slot />
+      </div>
+    </transition>
   </keep-alive>
 </template>
 
@@ -30,6 +32,10 @@ export default {
     index: {
       type: [Number, String],
       required: true
+    },
+    transition: {
+      type: String,
+      default: ''
     }
   },
   data() {
