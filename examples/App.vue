@@ -45,9 +45,9 @@
 </template>
 
 <script>
-import Waterfall from './components/Waterfall.vue'
-import WaterfallSlot from './components/WaterfallSlot.vue'
 import ItemFactory from './item-factory'
+import Waterfall from '../src/Waterfall.vue'
+import WaterfallSlot from '../src/WaterfallSlot.vue'
 
 export default {
   name: 'app',

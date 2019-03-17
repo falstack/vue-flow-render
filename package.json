@@ -1,10 +1,25 @@
 {
-  "name": "vue-waterfall",
+  "name": "v-waterfall",
   "version": "0.1.0",
-  "private": true,
+  "main": "dist/v-waterfall.umd.min.js",
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "waterfall",
+    "vue",
+    "pinterest",
+    "layout"
+  ],
+  "author": "falstack <icesilt@outlook.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/falstack/vue-waterfall/issues"
+  },
+  "homepage": "https://github.com/falstack/vue-waterfall",
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "dev": "vue-cli-service serve",
+    "build": "vue-cli-service build --target lib --name v-waterfall src/export.js",
     "lint": "vue-cli-service lint",
     "test:unit": "vue-cli-service test:unit"
   },
