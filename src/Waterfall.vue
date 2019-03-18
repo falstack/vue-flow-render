@@ -11,8 +11,6 @@
 </template>
 
 <script>
-const isServer = typeof window === 'undefined'
-
 const throttle = (func, wait, options) => {
   let context, args, result
   let timeout = null
@@ -110,8 +108,8 @@ export default {
       lineHeight: new Array(this.lineCount).fill(0),
       lastScrollTop: 0,
       rectTop: '',
-      windowHeight: isServer ? 0 : window.innerHeight,
-      windowWidth: isServer ? 0 : window.innerWidth
+      windowHeight: this.$isServer ? 0 : window.innerHeight,
+      windowWidth: this.$isServer ? 0 : window.innerWidth
     }
   },
   computed: {
@@ -121,7 +119,7 @@ export default {
       }
     },
     imageWidth() {
-      if (isServer) {
+      if (this.$isServer) {
         return 0
       }
       const toString = {}.toString
@@ -147,16 +145,13 @@ export default {
     }
   },
   created() {
-    if (isServer) {
+    if (this.$isServer) {
       return
     }
     this.$on('render', this.renderHandler)
     on(window, 'scroll', this.onScreenScroll)
   },
   beforeDestroy() {
-    if (isServer) {
-      return
-    }
     off(window, 'scroll', this.onScreenScroll)
   },
   methods: {
