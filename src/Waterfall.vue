@@ -82,7 +82,12 @@ export default {
       default: 0,
       validator: val => val >= 0
     },
-    scale: {
+    extraHeight: {
+      type: Number,
+      default: 0,
+      validator: val => val >= 0
+    },
+    lazyScale: {
       type: Number,
       default: 1.3,
       validator: val => val >= 1
@@ -147,23 +152,22 @@ export default {
     }, 200),
     renderHandler(item) {
       const displayLine = this.computeItemColIndex()
-      const imageHeight = this.computedItemHeight(item)
+      const itemHeight = this.computedItemHeight(item)
       const showMargin = item.index >= this.lineCount
       const lineHeight = this.lineHeight[displayLine]
       item.style = {
         left: `${displayLine * (this.imageWidth + this.marginRight)}px`,
         top: `${lineHeight}px`,
         width: `${this.imageWidth}px`,
-        height: `${imageHeight}px`,
+        height: `${itemHeight}px`,
         marginTop: showMargin ? `${this.marginBottom}px` : ''
       }
       const containerTop = this.getContainerRectTop()
       item.top = containerTop + lineHeight
-      item.bottom = containerTop + lineHeight + imageHeight
+      item.bottom = containerTop + lineHeight + itemHeight
       this.checkInView(item)
       this.lineHeight[displayLine] = +parseFloat(
-        lineHeight +
-          (showMargin ? imageHeight + this.marginBottom : imageHeight)
+        lineHeight + (showMargin ? itemHeight + this.marginBottom : itemHeight)
       ).toFixed(2)
       this.computeContainerHeight()
     },
@@ -172,8 +176,9 @@ export default {
       return lineHeight.indexOf(Math.min(...lineHeight))
     },
     computedItemHeight(item) {
-      return +parseFloat((item.height / item.width) * this.imageWidth).toFixed(
-        2
+      return (
+        +parseFloat((item.height / item.width) * this.imageWidth).toFixed(2) +
+        this.extraHeight
       )
     },
     computeContainerHeight() {
@@ -183,10 +188,10 @@ export default {
       this.$children.forEach(this.checkInView)
     },
     checkInView(item) {
-      const { lastScrollTop, windowHeight, scale } = this
+      const { lastScrollTop, windowHeight, lazyScale } = this
       item.display =
-        item.top < (lastScrollTop + windowHeight) * scale &&
-        item.bottom > lastScrollTop / scale
+        item.top < (lastScrollTop + windowHeight) * lazyScale &&
+        item.bottom > lastScrollTop / lazyScale
     },
     getContainerRectTop() {
       if (this.rectTop !== '') {

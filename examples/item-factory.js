@@ -7,13 +7,16 @@ export default new class {
     var items = [],
       i
     for (i = 0; i < count; i++) {
+      const width = 100 + ~~(Math.random() * 50)
+      const height = 100 + ~~(Math.random() * 50)
       items[i] = {
         index: this.lastIndex++,
         style: {
-          background: this.getRandomColor()
+          color: this.getRandomColor(),
+          image: `http://lorempixel.com/${width * 2}/${height * 2}/cats/`
         },
-        width: 100 + ~~(Math.random() * 50),
-        height: 100 + ~~(Math.random() * 50)
+        width,
+        height
       }
     }
     return items
