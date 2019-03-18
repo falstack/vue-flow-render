@@ -61,7 +61,6 @@ const off = (elem, type, listener, useCapture = false) => {
 }
 
 export default {
-  name: 'Waterfall',
   props: {
     lineCount: {
       required: true,

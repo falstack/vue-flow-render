@@ -1,6 +1,6 @@
 {
   "name": "vue-picflow",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "main": "dist/vue-picflow.umd.min.js",
   "files": [
     "dist"
@@ -24,7 +24,8 @@
     "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
-    "vue": "^2.6.6"
+    "vue": "^2.6.6",
+    "vue-picflow": "^0.1.2"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.1.0",
@@ -35,7 +36,7 @@
     "@vue/test-utils": "1.0.0-beta.29",
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "^10.0.1",
-    "babel-jest": "^23.6.0",
+    "babel-jest": "^24.5.0",
     "eslint": "^5.8.0",
     "eslint-plugin-vue": "^5.0.0",
     "node-sass": "^4.9.0",

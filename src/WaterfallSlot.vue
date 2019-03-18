@@ -20,7 +20,6 @@
 
 <script>
 export default {
-  name: 'WaterfallSlot',
   props: {
     width: {
       type: [Number, String],

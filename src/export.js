@@ -1,7 +1,7 @@
 import Waterfall from './Waterfall'
 import WaterfallSlot from './WaterfallSlot'
 
-export default {
+module.exports = {
   Waterfall: Waterfall,
   WaterfallSlot: WaterfallSlot,
   waterfall: Waterfall,
