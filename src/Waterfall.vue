@@ -184,7 +184,7 @@ export default {
     computedItemHeight(item) {
       return (
         +parseFloat((item.height / item.width) * this.imageWidth).toFixed(2) +
-        (this.extraHeight * this.windowWidth / this.vwViewport)
+        (this.extraHeight * this.windowWidth) / this.vwViewport
       )
     },
     computeContainerHeight() {

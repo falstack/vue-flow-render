@@ -21,9 +21,9 @@
     }
 
     .panel {
-      height: 100px;
-      line-height: 100px;
-      background-color: lightgray;
+      height: 40px;
+      line-height: 40px;
+      background-color: RGB(241, 243, 244);
     }
   }
 
@@ -41,13 +41,13 @@
 
 <template>
   <div id="app">
-    <div id="lag-container"/>
+    <div id="lag-container" />
     <waterfall
       line-width="50%"
       :line-count="2"
       :margin-bottom="10"
       :margin-right="10"
-      :extra-height="100"
+      :extra-height="40"
       :vw-viewport="375"
     >
       <waterfall-slot
@@ -63,7 +63,7 @@
             :style="{
               backgroundColor: item.style.color,
               backgroundImage: `url(${item.style.image})`,
-              paddingTop: `${item.height / item.width * 100}%`
+              paddingTop: `${(item.height / item.width) * 100}%`
             }"
             class="image"
           />
