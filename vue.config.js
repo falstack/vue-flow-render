@@ -6,5 +6,16 @@ module.exports = {
       filename: 'index.html'
     }
   },
-  css: { extract: false }
+  css: {
+    extract: false,
+    loaderOptions: {
+      postcss: {
+        plugins: [
+          require('postcss-px-to-viewport')({
+            viewportWidth: 375
+          })
+        ]
+      }
+    }
+  }
 }

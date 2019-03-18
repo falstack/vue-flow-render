@@ -87,6 +87,11 @@ export default {
       default: 0,
       validator: val => val >= 0
     },
+    vwViewport: {
+      type: Number,
+      default: 0,
+      validator: val => val >= 0
+    },
     lazyScale: {
       type: Number,
       default: 1.3,
@@ -99,7 +104,8 @@ export default {
       lineHeight: new Array(this.lineCount).fill(0),
       lastScrollTop: 0,
       rectTop: '',
-      windowHeight: this.$isServer ? 0 : window.innerHeight
+      windowHeight: this.$isServer ? 0 : window.innerHeight,
+      windowWidth: this.$isServer ? 0 : window.innerWidth
     }
   },
   computed: {
@@ -121,7 +127,7 @@ export default {
       const shim = (this.lineCount - 1) * this.marginRight
       if (/vw$/.test(lineWidth)) {
         return +parseFloat(
-          ((window.innerWidth - shim) * lineWidth.replace('vw', '')) / 100
+          ((this.windowWidth - shim) * lineWidth.replace('vw', '')) / 100
         ).toFixed(2)
       }
       if (/%$/.test(lineWidth)) {
@@ -178,7 +184,7 @@ export default {
     computedItemHeight(item) {
       return (
         +parseFloat((item.height / item.width) * this.imageWidth).toFixed(2) +
-        this.extraHeight
+        (this.extraHeight * this.windowWidth / this.vwViewport)
       )
     },
     computeContainerHeight() {

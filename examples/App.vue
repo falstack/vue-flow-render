@@ -21,8 +21,9 @@
     }
 
     .panel {
-      height: 40px;
-      line-height: 40px;
+      height: 100px;
+      line-height: 100px;
+      background-color: lightgray;
     }
   }
 
@@ -46,7 +47,8 @@
       :line-count="2"
       :margin-bottom="10"
       :margin-right="10"
-      :extra-height="40"
+      :extra-height="100"
+      :vw-viewport="375"
     >
       <waterfall-slot
         v-for="item in items"
