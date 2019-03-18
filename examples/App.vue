@@ -1,5 +1,10 @@
 <style lang="scss">
 #app {
+  ul {
+    padding: 0;
+    margin: 0;
+  }
+
   .demo {
     width: 100%;
     height: 100%;
@@ -48,27 +53,20 @@
       :extra-height="40"
       :vw-viewport="375"
       :max-height="300"
+      :list="items"
+      transition="fade"
     >
-      <waterfall-slot
-        v-for="item in items"
-        :key="item.index"
-        :index="item.index"
-        :width="item.width"
-        :height="item.height"
-        transition="fade"
-      >
-        <div class="demo">
-          <div
-            :style="{
-              backgroundColor: item.style.color,
-              backgroundImage: `url(${item.style.image})`,
-              paddingTop: `${(item.height / item.width) * 100}%`
-            }"
-            class="image"
-          />
-          <div class="panel">{{ item.index }}</div>
-        </div>
-      </waterfall-slot>
+      <div slot-scope="{ item }" slot="item" class="demo">
+        <div
+          :style="{
+            backgroundColor: item.style.color,
+            backgroundImage: `url(${item.style.image})`,
+            paddingTop: `${(item.height / item.width) * 100}%`
+          }"
+          class="image"
+        />
+        <div class="panel">{{ item.index }}</div>
+      </div>
     </waterfall>
   </div>
 </template>
@@ -76,18 +74,16 @@
 <script>
 import ItemFactory from './item-factory'
 import Waterfall from '../src/Waterfall.vue'
-import WaterfallSlot from '../src/WaterfallSlot.vue'
 import './justice'
 
 export default {
   name: 'app',
   components: {
-    Waterfall,
-    WaterfallSlot
+    Waterfall
   },
   data() {
     return {
-      items: ItemFactory.get(100)
+      items: ItemFactory.get(10000)
     }
   },
   mounted() {

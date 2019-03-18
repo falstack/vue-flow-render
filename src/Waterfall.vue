@@ -1,13 +1,33 @@
 <style lang="scss">
-.vue-waterfall-container {
+.vue-picflow-wrap {
   position: relative;
+
+  .vue-picflow-item {
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
 }
 </style>
 
 <template>
-  <div :style="containerStyle" class="vue-waterfall-container">
-    <slot />
-  </div>
+  <transition-group
+    :name="transition"
+    :style="containerStyle"
+    class="vue-picflow-wrap"
+    tag="div"
+  >
+    <div
+      v-for="item in filterList"
+      :key="item.id"
+      :style="item._style"
+      class="vue-picflow-item"
+    >
+      <slot name="item" :item="item" />
+    </div>
+  </transition-group>
 </template>
 
 <script>
@@ -100,6 +120,14 @@ export default {
       type: Number,
       default: 2,
       validator: val => val >= 1
+    },
+    list: {
+      type: Array,
+      required: true
+    },
+    transition: {
+      type: String,
+      default: ''
     }
   },
   data() {
@@ -109,7 +137,9 @@ export default {
       lastScrollTop: 0,
       rectTop: '',
       windowHeight: this.$isServer ? 0 : window.innerHeight,
-      windowWidth: this.$isServer ? 0 : window.innerWidth
+      windowWidth: this.$isServer ? 0 : window.innerWidth,
+      virtualList: [],
+      filterList: []
     }
   },
   computed: {
@@ -144,11 +174,18 @@ export default {
       return +lineWidth.replace('px', '')
     }
   },
-  created() {
-    if (this.$isServer) {
-      return
-    }
+  mounted() {
     this.$on('render', this.renderHandler)
+    this.$watch(
+      'list',
+      function(newVal) {
+        this.computedVirtualMetas(newVal.slice(this.virtualList.length))
+      },
+      {
+        deep: false,
+        immediate: true
+      }
+    )
     on(window, 'scroll', this.onScreenScroll)
   },
   beforeDestroy() {
@@ -160,26 +197,34 @@ export default {
         document.documentElement.scrollTop || document.body.scrollTop
       this.showOrHiddenItem()
     }, 200),
+    computedVirtualMetas(newList) {
+      this.virtualList = this.virtualList.concat(
+        newList.map(this.renderHandler)
+      )
+      this.refreshPage()
+    },
     renderHandler(item) {
       const displayLine = this.computeItemColIndex()
       const itemHeight = this.computedItemHeight(item)
-      const showMargin = item.index >= this.lineCount
       const lineHeight = this.lineHeight[displayLine]
-      item.style = {
+      item._style = {
         left: `${displayLine * (this.imageWidth + this.marginRight)}px`,
         top: `${lineHeight}px`,
         width: `${this.imageWidth}px`,
         height: `${itemHeight}px`,
-        marginTop: showMargin ? `${this.marginBottom}px` : ''
+        marginBottom: `${this.marginBottom}px`
       }
       const containerTop = this.getContainerRectTop()
-      item.top = containerTop + lineHeight
-      item.bottom = containerTop + lineHeight + itemHeight
+      item._pos = {
+        top: containerTop + lineHeight,
+        bottom: containerTop + lineHeight + itemHeight
+      }
       this.checkInView(item)
       this.lineHeight[displayLine] = +parseFloat(
-        lineHeight + (showMargin ? itemHeight + this.marginBottom : itemHeight)
+        lineHeight + itemHeight + this.marginBottom
       ).toFixed(2)
       this.computeContainerHeight()
+      return item
     },
     computeItemColIndex() {
       const { lineHeight } = this
@@ -200,13 +245,16 @@ export default {
       this.height = Math.max(...this.lineHeight)
     },
     showOrHiddenItem() {
-      this.$children.forEach(this.checkInView)
+      this.virtualList.forEach(this.checkInView)
+      this.refreshPage()
     },
     checkInView(item) {
       const { lastScrollTop, windowHeight, lazyScale } = this
-      item.display =
-        item.top < (lastScrollTop + windowHeight) * lazyScale &&
-        item.bottom > lastScrollTop / lazyScale
+      const { top, bottom } = item._pos
+      item._display =
+        Math.abs(lastScrollTop - top) <= windowHeight * lazyScale &&
+        Math.abs(lastScrollTop + windowHeight - bottom) <=
+          windowHeight * lazyScale
     },
     getContainerRectTop() {
       if (this.rectTop !== '') {
@@ -215,6 +263,9 @@ export default {
       const top = getOffsetTop(this.$el)
       this.rectTop = top
       return top
+    },
+    refreshPage() {
+      this.filterList = this.virtualList.filter(_ => _._display)
     }
   }
 }

@@ -11,6 +11,7 @@ export default new class {
       const height = 100 + ~~(Math.random() * 300)
       items[i] = {
         index: this.lastIndex++,
+        id: Math.random().toString(36),
         style: {
           color: this.getRandomColor(),
           image: `http://lorempixel.com/${width * 2}/${height * 2}/cats/`
