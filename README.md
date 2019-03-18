@@ -74,7 +74,7 @@ components: {
 | max-height | Number, >= 0 | 每个块的最大高度 | N | 
 
 ## waterfall-slot args
-| key | value | meaning |
+| key | value | meaning | required |
 | ------ | ------ | ------ | ------ |
 | width | Number, >= 0 | 图片的宽度 | Y |
 | height | Number, >= 0 | 图片的高度 | Y |
