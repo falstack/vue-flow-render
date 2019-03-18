@@ -1,7 +1,7 @@
 {
-  "name": "v-waterfall",
-  "version": "0.1.0",
-  "main": "dist/v-waterfall.umd.min.js",
+  "name": "vue-picflow",
+  "version": "0.1.1",
+  "main": "dist/vue-picflow.umd.min.js",
   "files": [
     "dist"
   ],
@@ -14,12 +14,12 @@
   "author": "falstack <icesilt@outlook.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/falstack/vue-waterfall/issues"
+    "url": "https://github.com/falstack/vue-picflow/issues"
   },
-  "homepage": "https://github.com/falstack/vue-waterfall",
+  "homepage": "https://github.com/falstack/vue-picflow",
   "scripts": {
     "dev": "vue-cli-service serve",
-    "build": "vue-cli-service build --target lib --name v-waterfall src/export.js",
+    "build": "vue-cli-service build --target lib --name vue-picflow src/export.js",
     "lint": "vue-cli-service lint",
     "test:unit": "vue-cli-service test:unit"
   },
