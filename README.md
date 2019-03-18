@@ -65,6 +65,7 @@ components: {
 ## waterfall args
 ```markdown
 | key | value | meaning | required |
+| ------ | ------ | ------ | ------ |
 | line-width | Number, px, %, vw | 每行的宽度 | Y |
 | line-count | Number, >= 2 | 瀑布流的行数 | Y |
 | margin-bottom | Number, >= 0 | 每个块的上下间距 | N |
@@ -76,6 +77,7 @@ components: {
 ## waterfall-slot args
 ```markdown
 | key | value | meaning |
+| ------ | ------ | ------ | ------ |
 | width | Number, >= 0 | 图片的宽度 | Y |
 | height | Number, >= 0 | 图片的高度 | Y |
 | index | Number, >=0 | 图片的 index | Y |
@@ -101,7 +103,7 @@ yarn run build
 yarn run lint
 ```
 
-### Run your unit tests
+### Run your unit tests（nothing）
 ```
 yarn run test:unit
 ```
