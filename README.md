@@ -63,7 +63,6 @@ components: {
 </template>
 ```
 ## waterfall args
-```markdown
 | key | value | meaning | required |
 | ------ | ------ | ------ | ------ |
 | line-width | Number, px, %, vw | 每行的宽度 | Y |
@@ -73,16 +72,15 @@ components: {
 | extra-height | Number, >= 0 | 出去图片外的 DOM 的高度 | N |
 | vw-viewport | Number, >= 0 | vw 模式下的视口宽度 | N |
 | max-height | Number, >= 0 | 每个块的最大高度 | N | 
-```
+
 ## waterfall-slot args
-```markdown
 | key | value | meaning |
 | ------ | ------ | ------ | ------ |
 | width | Number, >= 0 | 图片的宽度 | Y |
 | height | Number, >= 0 | 图片的高度 | Y |
 | index | Number, >=0 | 图片的 index | Y |
 | transition | String | 每个块的渐变动画 | N |
-```
+
 ## Project setup
 ```
 yarn install
