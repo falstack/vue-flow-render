@@ -3,7 +3,7 @@ const npmCfg = require('./package.json')
 
 const banner = [
   'vue-picflow v' + npmCfg.version,
-  '(c) ' + (new Date().getFullYear()) + ' ' + npmCfg.author,
+  '(c) ' + new Date().getFullYear() + ' ' + npmCfg.author,
   npmCfg.homepage
 ].join('\n')
 
@@ -17,9 +17,7 @@ module.exports = {
     }
   },
   configureWebpack: {
-    plugins: [
-      new webpack.BannerPlugin(banner)
-    ]
+    plugins: [new webpack.BannerPlugin(banner)]
   },
   css: {
     extract: false,

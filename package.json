@@ -1,6 +1,6 @@
 {
   "name": "vue-picflow",
-  "version": "0.1.2",
+  "version": "0.1.4",
   "main": "dist/vue-picflow.umd.min.js",
   "files": [
     "dist"

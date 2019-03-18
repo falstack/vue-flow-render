@@ -11,6 +11,8 @@
 </template>
 
 <script>
+const isServer = typeof window === 'undefined'
+
 const throttle = (func, wait, options) => {
   let context, args, result
   let timeout = null
@@ -98,7 +100,7 @@ export default {
     },
     lazyScale: {
       type: Number,
-      default: 1.3,
+      default: 2,
       validator: val => val >= 1
     }
   },
@@ -108,8 +110,8 @@ export default {
       lineHeight: new Array(this.lineCount).fill(0),
       lastScrollTop: 0,
       rectTop: '',
-      windowHeight: this.$isServer ? 0 : window.innerHeight,
-      windowWidth: this.$isServer ? 0 : window.innerWidth
+      windowHeight: isServer ? 0 : window.innerHeight,
+      windowWidth: isServer ? 0 : window.innerWidth
     }
   },
   computed: {
@@ -119,7 +121,7 @@ export default {
       }
     },
     imageWidth() {
-      if (this.$isServer) {
+      if (isServer) {
         return 0
       }
       const toString = {}.toString
@@ -145,13 +147,16 @@ export default {
     }
   },
   created() {
-    if (this.$isServer) {
+    if (isServer) {
       return
     }
     this.$on('render', this.renderHandler)
     on(window, 'scroll', this.onScreenScroll)
   },
   beforeDestroy() {
+    if (isServer) {
+      return
+    }
     off(window, 'scroll', this.onScreenScroll)
   },
   methods: {
@@ -188,7 +193,9 @@ export default {
     computedItemHeight(item) {
       const result =
         +parseFloat((item.height / item.width) * this.imageWidth).toFixed(2) +
-        (this.extraHeight * this.windowWidth) / this.vwViewport
+        (this.vwViewport
+          ? (this.extraHeight * this.windowWidth) / this.vwViewport
+          : this.extraHeight)
       if (this.maxHeight && result > this.maxHeight) {
         return this.maxHeight
       }

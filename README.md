@@ -4,9 +4,10 @@
 
 ## feature
 ```markdown
-1. 支持百分比宽度，vw，支持瀑布流的惰性填充
-2. 暂不支持 resize
-3. 暂不支持重排序
+1. 支持百分比宽度，vw
+2. 支持瀑布流的惰性填充
+3. 暂不支持 resize
+4. 暂不支持重排序
 ```
 
 ## download
@@ -72,6 +73,7 @@ components: {
 | extra-height | Number, >= 0 | 出去图片外的 DOM 的高度 | N |
 | vw-viewport | Number, >= 0 | vw 模式下的视口宽度 | N |
 | max-height | Number, >= 0 | 每个块的最大高度 | N | 
+| lazy-scale | Number, >= 1 | 懒加载的比率 | N |
 
 ## waterfall-slot args
 | key | value | meaning | required |
