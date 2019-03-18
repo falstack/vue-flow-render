@@ -1,11 +1,5 @@
 <style lang="scss">
 #app {
-  #lag-container {
-    z-index: 999;
-    position: fixed;
-    right: 10px;
-    top: 10px;
-  }
   .demo {
     width: 100%;
     height: 100%;
@@ -13,6 +7,7 @@
     border-radius: 8px;
     box-shadow: 0 1px 3px 0 rgba(80, 80, 80, 0.11);
     overflow: hidden;
+    position: relative;
 
     .image {
       background-position: center;
@@ -21,6 +16,10 @@
     }
 
     .panel {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
       height: 40px;
       line-height: 40px;
       background-color: RGB(241, 243, 244);
@@ -41,7 +40,6 @@
 
 <template>
   <div id="app">
-    <div id="lag-container" />
     <waterfall
       line-width="50%"
       :line-count="2"
@@ -49,6 +47,7 @@
       :margin-right="10"
       :extra-height="40"
       :vw-viewport="375"
+      :max-height="300"
     >
       <waterfall-slot
         v-for="item in items"

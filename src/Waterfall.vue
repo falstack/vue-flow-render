@@ -87,6 +87,11 @@ export default {
       default: 0,
       validator: val => val >= 0
     },
+    maxHeight: {
+      type: Number,
+      default: 0,
+      validator: val => val >= 0
+    },
     vwViewport: {
       type: Number,
       default: 0,
@@ -182,10 +187,13 @@ export default {
       return lineHeight.indexOf(Math.min(...lineHeight))
     },
     computedItemHeight(item) {
-      return (
+      const result =
         +parseFloat((item.height / item.width) * this.imageWidth).toFixed(2) +
         (this.extraHeight * this.windowWidth) / this.vwViewport
-      )
+      if (this.maxHeight && result > this.maxHeight) {
+        return this.maxHeight
+      }
+      return result
     },
     computeContainerHeight() {
       this.height = Math.max(...this.lineHeight)
