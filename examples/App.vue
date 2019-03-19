@@ -45,7 +45,7 @@
 
 <template>
   <div id="app">
-    <waterfall
+    <vue-flow-render
       line-width="50%"
       :line-count="2"
       :margin-bottom="10"
@@ -67,18 +67,18 @@
         />
         <div class="panel">{{ item.index }}</div>
       </div>
-    </waterfall>
+    </vue-flow-render>
   </div>
 </template>
 
 <script>
 import ItemFactory from './item-factory'
-import Waterfall from '../src/Waterfall.vue'
+import VueFlowRender from '../src/VueFlowRender.vue'
 
 export default {
   name: 'app',
   components: {
-    Waterfall
+    VueFlowRender
   },
   data() {
     return {
