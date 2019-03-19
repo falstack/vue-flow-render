@@ -1,7 +1,7 @@
 {
-  "name": "vue-picflow",
+  "name": "vue-flow-render",
   "version": "0.1.5",
-  "main": "dist/vue-picflow.umd.min.js",
+  "main": "dist/vue-flow-render.umd.min.js",
   "files": [
     "dist"
   ],
@@ -14,18 +14,17 @@
   "author": "falstack <icesilt@outlook.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/falstack/vue-picflow/issues"
+    "url": "https://github.com/falstack/vue-flow-render/issues"
   },
-  "homepage": "https://github.com/falstack/vue-picflow",
+  "homepage": "https://github.com/falstack/vue-flow-render",
   "scripts": {
     "dev": "vue-cli-service serve",
-    "build": "vue-cli-service build --target lib --name vue-picflow src/export.js",
+    "build": "vue-cli-service build --target lib --name vue-flow-render src/export.js",
     "lint": "vue-cli-service lint",
     "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
-    "vue": "^2.6.6",
-    "vue-picflow": "^0.1.2"
+    "vue": "^2.6.6"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.1.0",

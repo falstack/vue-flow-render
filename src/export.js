@@ -1,6 +1,6 @@
-import Waterfall from './Waterfall'
+import VueFlowRender from './VueFlowRender'
 
 module.exports = {
-  Waterfall: Waterfall,
-  waterfall: Waterfall
+  VueFlowRender: VueFlowRender,
+  'vue-flow-render': VueFlowRender
 }

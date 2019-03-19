@@ -52,7 +52,7 @@
       :margin-right="10"
       :extra-height="40"
       :vw-viewport="375"
-      :max-height="300"
+      :max-height="800"
       :list="items"
       transition="fade"
     >
@@ -74,7 +74,6 @@
 <script>
 import ItemFactory from './item-factory'
 import Waterfall from '../src/Waterfall.vue'
-import './justice'
 
 export default {
   name: 'app',
@@ -85,11 +84,6 @@ export default {
     return {
       items: ItemFactory.get(10000)
     }
-  },
-  mounted() {
-    window.Justice.init({
-      showFPS: true
-    })
   }
 }
 </script>
