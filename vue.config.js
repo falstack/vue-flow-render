@@ -20,7 +20,7 @@ module.exports = {
     plugins: [new webpack.BannerPlugin(banner)]
   },
   css: {
-    extract: false,
+    extract: true,
     loaderOptions: {
       postcss: {
         plugins: [

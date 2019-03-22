@@ -21,16 +21,16 @@ npm install vue-flow-render
 
 ## usage
 ```javascript
-import { Waterfall, WaterfallSlot } from 'vue-flow-render'
+import FlowRender from 'vue-flow-render'
 ```
 ```vue
 components: {
-  VueFlowRender
+  FlowRender
 }
 ```
 ```html
 <template>
-  <vue-flow-render
+  <FlowRender
     line-width="50%"
     :line-count="2"
     :margin-bottom="10"
@@ -52,7 +52,7 @@ components: {
       />
       <div class="panel">{{ item.index }}</div>
     </div>
-  </vue-flow-render>
+  </FlowRender>
 </template>
 ```
 ## waterfall args

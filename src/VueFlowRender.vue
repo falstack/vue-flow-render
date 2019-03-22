@@ -1,31 +1,6 @@
-<style lang="scss">
-.vue-picflow-wrap {
-  position: relative;
-  overflow: hidden;
-
-  .vue-picflow-item {
-    position: absolute;
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    overflow: hidden;
-  }
-}
-</style>
-
 <template>
-  <transition-group
-    :name="transition"
-    :style="containerStyle"
-    class="vue-picflow-wrap"
-    tag="div"
-  >
-    <div
-      v-for="item in filterList"
-      :key="item.id"
-      :style="item._style"
-      class="vue-picflow-item"
-    >
+  <transition-group :name="transition" :style="containerStyle" tag="div">
+    <div v-for="item in filterList" :key="item.id" :style="item._style">
       <slot name="item" :item="item" />
     </div>
   </transition-group>
@@ -149,7 +124,9 @@ export default {
   computed: {
     containerStyle() {
       return {
-        height: `${this.height - this.marginBottom}px`
+        height: `${this.height - this.marginBottom}px`,
+        position: 'relative',
+        overflow: 'hidden'
       }
     },
     containerOffsetTop() {
@@ -183,9 +160,7 @@ export default {
       }
       if (/%$/.test(lineWidth)) {
         return +parseFloat(
-          ((this.$el.parentNode.offsetWidth - shim) *
-            lineWidth.replace('%', '')) /
-            100
+          ((this.$el.offsetWidth - shim) * lineWidth.replace('%', '')) / 100
         ).toFixed(2)
       }
       return +lineWidth.replace('px', '')
@@ -195,7 +170,9 @@ export default {
     this.$watch(
       'list',
       function(newVal) {
-        this.virtualList = newVal.map(this.computeStyle)
+        this.virtualList = this.virtualList.concat(
+          newVal.slice(this.virtualList.length).map(this.computeStyle)
+        )
         this.render(true)
       },
       {
@@ -221,6 +198,7 @@ export default {
       const itemHeight = this.computeItemHeight(item)
       const lineHeight = this.lineHeight[displayLine]
       item._style = {
+        position: 'absolute',
         left: `${displayLine * (this.imageWidth + this.marginRight)}px`,
         top: `${lineHeight}px`,
         width: `${this.imageWidth}px`,
