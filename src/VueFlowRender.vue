@@ -174,19 +174,21 @@ export default {
   },
   mounted() {
     this.canRender = true
-    this.$watch(
-      'list',
-      function(newVal) {
-        this.virtualList = this.virtualList.concat(
-          newVal.slice(this.virtualList.length).map(this.computeStyle)
-        )
-        this.render(true)
-      },
-      {
-        deep: false,
-        immediate: true
-      }
-    )
+    this.$nextTick(() => {
+      this.$watch(
+        'list',
+        function(newVal) {
+          this.virtualList = this.virtualList.concat(
+            newVal.slice(this.virtualList.length).map(this.computeStyle)
+          )
+          this.render(true)
+        },
+        {
+          deep: false,
+          immediate: true
+        }
+      )
+    })
     on(window, 'scroll', this.onScreenScroll)
   },
   beforeDestroy() {
