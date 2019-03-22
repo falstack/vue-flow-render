@@ -1,5 +1,10 @@
 <template>
-  <transition-group :name="transition" :style="containerStyle" tag="div">
+  <transition-group
+    v-if="canRender"
+    :name="transition"
+    :style="containerStyle"
+    tag="div"
+  >
     <div v-for="item in filterList" :key="item.id" :style="item._style">
       <slot name="item" :item="item" />
     </div>
@@ -118,7 +123,8 @@ export default {
       beginIndex: -1,
       endIndex: 0,
       centerIndex: -1,
-      isScrollDown: false
+      isScrollDown: false,
+      canRender: false
     }
   },
   computed: {
@@ -167,6 +173,7 @@ export default {
     }
   },
   mounted() {
+    this.canRender = true
     this.$watch(
       'list',
       function(newVal) {
