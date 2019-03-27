@@ -2,7 +2,7 @@ const webpack = require('webpack')
 const npmCfg = require('./package.json')
 
 const banner = [
-  'vue-picflow v' + npmCfg.version,
+  npmCfg.name + ' v' + npmCfg.version,
   '(c) ' + new Date().getFullYear() + ' ' + npmCfg.author,
   npmCfg.homepage
 ].join('\n')
