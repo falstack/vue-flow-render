@@ -9402,6 +9402,11 @@ throat@^4.0.0:
   resolved "http://registry.npm.taobao.org/throat/download/throat-4.1.0.tgz#89037cbc92c56ab18926e6ba4cbb200e15672a6a"
   integrity sha1-iQN8vJLFarGJJua6TLsgDhVnKmo=
 
+throttle-debounce@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/throttle-debounce/-/throttle-debounce-2.1.0.tgz#257e648f0a56bd9e54fe0f132c4ab8611df4e1d5"
+  integrity sha512-AOvyNahXQuU7NN+VVvOOX+uW6FPaWdAOdRP5HfwYxAfCzXTFKRMoIMk+n+po318+ktcChx+F1Dd91G3YHeMKyg==
+
 through2@^2.0.0:
   version "2.0.5"
   resolved "http://registry.npm.taobao.org/through2/download/through2-2.0.5.tgz#01c1e39eb31d07cb7d03a96a70823260b23132cd"
@@ -9864,21 +9869,6 @@ vue-loader@^15.6.4:
     loader-utils "^1.1.0"
     vue-hot-reload-api "^2.3.0"
     vue-style-loader "^4.1.0"
-
-vue-picflow@^0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/vue-picflow/-/vue-picflow-0.1.1.tgz#dc94d60239062aa601fb779bd07997b9d5707492"
-  integrity sha512-+Yn0Nmrk4P+RvhS4X5MU8ZK6ld4C6Lpa2BiU4ExhtUff4+7bt99Wp/nMntd0Zvra9h1cxAHVOT1Awe/dKdWWqg==
-  dependencies:
-    vue "^2.6.6"
-
-vue-picflow@^0.1.2:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/vue-picflow/-/vue-picflow-0.1.2.tgz#56d8b6ce1452ca0a702e1cc68742d16a393bc5cd"
-  integrity sha512-2wFF9Ab6vu7n0ETtMtyLaHplOaE5sLNQ6Psfspcw3DuM1iAlXkOSfCXdSt8yYhjH0UiTUbC+ulozVGk2SepuBA==
-  dependencies:
-    vue "^2.6.6"
-    vue-picflow "^0.1.1"
 
 vue-style-loader@^4.1.0:
   version "4.1.2"

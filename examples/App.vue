@@ -52,19 +52,19 @@
       :margin-right="10"
       :extra-height="40"
       :vw-viewport="375"
-      :max-height="800"
+      :max-height="400"
       :list="items"
-      transition="fade"
     >
       <div slot-scope="{ item }" slot="item" class="demo">
         <div
           :style="{
             backgroundColor: item.style.color,
-            backgroundImage: `url(${item.style.image})`,
             paddingTop: `${(item.height / item.width) * 100}%`
           }"
           class="image"
-        />
+        >
+          {{ item._pos.top }} - {{ item._pos.bottom }}
+        </div>
         <div class="panel">{{ item.index }}</div>
       </div>
     </vue-flow-render>

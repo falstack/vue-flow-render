@@ -12,37 +12,7 @@
 </template>
 
 <script>
-const throttle = (func, wait, options) => {
-  let context, args, result
-  let timeout = null
-  let previous = 0
-  if (!options) options = {}
-  const later = function() {
-    previous = options.leading === false ? 0 : Date.now()
-    timeout = null
-    result = func.apply(context, args)
-    if (!timeout) context = args = null
-  }
-  return function() {
-    const now = Date.now()
-    if (!previous && options.leading === false) previous = now
-    const remaining = wait - (now - previous)
-    context = this
-    args = arguments
-    if (remaining <= 0 || remaining > wait) {
-      if (timeout) {
-        clearTimeout(timeout)
-        timeout = null
-      }
-      previous = now
-      result = func.apply(context, args)
-      if (!timeout) context = args = null
-    } else if (!timeout && options.trailing !== false) {
-      timeout = setTimeout(later, remaining)
-    }
-    return result
-  }
-}
+import { throttle } from 'throttle-debounce'
 
 const getOffsetTop = elem => {
   let offsetTop = 0
@@ -97,11 +67,6 @@ export default {
       default: 0,
       validator: val => val >= 0
     },
-    lazyScale: {
-      type: Number,
-      default: 2,
-      validator: val => val >= 1
-    },
     list: {
       type: Array,
       required: true
@@ -109,6 +74,10 @@ export default {
     transition: {
       type: String,
       default: ''
+    },
+    preload: {
+      type: Number,
+      default: 500
     }
   },
   data() {
@@ -143,10 +112,7 @@ export default {
     },
     onceRenderItemCount() {
       const itemAvgHeight = (this.height - this.marginBottom) / this.list.length
-      return (
-        Math.ceil((this.windowHeight * this.lazyScale) / itemAvgHeight) *
-        this.lineCount
-      )
+      return Math.ceil((this.windowHeight + this.preload * 2) / itemAvgHeight)
     },
     imageWidth() {
       if (this.$isServer) {
@@ -195,13 +161,13 @@ export default {
     off(window, 'scroll', this.onScreenScroll)
   },
   methods: {
-    onScreenScroll: throttle(function() {
+    onScreenScroll: throttle(200, function() {
       const scrollTop =
         document.documentElement.scrollTop || document.body.scrollTop
       this.isScrollDown = scrollTop > this.lastScrollTop
       this.lastScrollTop = scrollTop
       this.render()
-    }, 200),
+    }),
     computeStyle(item) {
       const displayLine = this.computeItemColIndex()
       const itemHeight = this.computeItemHeight(item)
@@ -232,22 +198,21 @@ export default {
     },
     computeItemHeight(item) {
       const result =
-        +parseFloat((item.height / item.width) * this.imageWidth).toFixed(2) +
+        (item.height / item.width) * this.imageWidth +
         (this.vwViewport
           ? (this.extraHeight * this.windowWidth) / this.vwViewport
           : this.extraHeight)
       if (this.maxHeight && result > this.maxHeight) {
         return this.maxHeight
       }
-      return result
+      return parseInt(result)
     },
     computeContainerHeight() {
       this.height = Math.max(...this.lineHeight)
     },
     render(reset = false) {
-      let offset, begin, end
+      let begin, end
       if (reset) {
-        offset = 0
         begin = 0
         end = this.virtualList.length
       } else {
@@ -259,36 +224,26 @@ export default {
         if (end > this.list.length) {
           end = this.list.length
         }
-        offset = begin
       }
       const renderList = this.virtualList.slice(begin, end)
-      let lastRendered = false
+      const list = []
       for (const item of renderList) {
-        const result = this.checkInView(item)
-        if (result) {
-          lastRendered = true
-        }
-        if (!lastRendered && !result) {
-          offset++
-        }
-        if (lastRendered && !result) {
-          break
+        if (this.checkInView(item)) {
+          list.push(item)
         }
       }
-      const list = renderList.filter(_ => _._display)
-      this.beginIndex = offset
+      this.beginIndex = list.length ? list[0].index : 0
       this.filterList = list
       if (!list.length) {
         this.render(true)
       }
     },
     checkInView(item) {
-      const { lastScrollTop, windowHeight, lazyScale } = this
+      const { lastScrollTop, windowHeight, preload } = this
       const { top, bottom } = item._pos
       const result =
-        Math.abs(lastScrollTop - top) <= windowHeight * lazyScale &&
-        Math.abs(lastScrollTop + windowHeight - bottom) <=
-          windowHeight * lazyScale
+        top - lastScrollTop < windowHeight + preload &&
+        bottom - lastScrollTop + preload > 0
       item._display = result
       return result
     }
