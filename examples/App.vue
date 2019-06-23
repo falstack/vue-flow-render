@@ -1,33 +1,30 @@
 <style lang="scss">
 #app {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  padding-top: 15px;
+  overflow: auto;
+
   ul {
     padding: 0;
     margin: 0;
   }
 
   .demo {
-    width: 100%;
-    height: 100%;
-    text-align: center;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px 0 rgba(80, 80, 80, 0.11);
-    overflow: hidden;
-    position: relative;
+    box-sizing: border-box;
+    padding: 0 15px 15px;
 
-    .image {
-      background-position: center;
-      background-repeat: no-repeat;
-      background-size: cover;
-    }
-
-    .panel {
-      position: absolute;
-      left: 0;
-      bottom: 0;
-      width: 100%;
-      height: 40px;
-      line-height: 40px;
-      background-color: RGB(241, 243, 244);
+    div {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px 0 rgba(80, 80, 80, 0.11);
     }
   }
 
@@ -44,45 +41,43 @@
 </style>
 
 <template>
-  <div id="app">
-    <vue-flow-render
-      line-width="50%"
-      :line-count="2"
-      :margin-bottom="10"
-      :margin-right="10"
-      :extra-height="40"
-      :vw-viewport="375"
-      :max-height="400"
-      :list="items"
+  <div
+    id="app"
+    @scroll="handleScroll"
+  >
+    <v-render
+      :total="100"
+      :remain="10"
+      :offset="offset"
     >
-      <div slot-scope="{ item }" slot="item" class="demo">
-        <div
-          :style="{
-            backgroundColor: item.style.color,
-            paddingTop: `${(item.height / item.width) * 100}%`
-          }"
-          class="image"
-        >
-          {{ item._pos.top }} - {{ item._pos.bottom }}
+      <div
+        v-for="(item, index) in items"
+        :key="index"
+        :style="{ height: `${item.height}px` }"
+        class="demo"
+      >
+        <div :style="{ backgroundColor: item.style.color }">
+          {{ index }}
         </div>
-        <div class="panel">{{ item.index }}</div>
       </div>
-    </vue-flow-render>
+    </v-render>
   </div>
 </template>
 
 <script>
 import ItemFactory from './item-factory'
-import VueFlowRender from '../src/VueFlowRender.vue'
 
 export default {
-  name: 'app',
-  components: {
-    VueFlowRender
-  },
+  name: 'App',
   data() {
     return {
-      items: ItemFactory.get(10000)
+      items: ItemFactory.get(100),
+      offset: 0
+    }
+  },
+  methods: {
+    handleScroll(evt) {
+      this.offset = evt.target.scrollTop
     }
   }
 }
