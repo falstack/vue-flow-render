@@ -7,6 +7,7 @@
   bottom: 0;
   padding-top: 15px;
   overflow: auto;
+  -webkit-overflow-scrolling: touch;
 
   ul {
     padding: 0;
