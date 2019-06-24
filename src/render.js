@@ -35,6 +35,7 @@ export default {
   data() {
     return {
       lastScrollTop: 0,
+      isUp: false,
       start: 0,
       style: {
         height: 0,
@@ -62,17 +63,30 @@ export default {
   mounted() {
     this._computeRenderHeight(this.$slots.default, 0)
   },
+  beforeUpdate() {
+    if (this.isUp) {
+      const rect = this._getItemOffset(this.start)
+      if (rect.top + rect.height > this.lastScrollTop) {
+        console.log('re compute start')
+      }
+    } else {
+      const rect = this._getItemOffset(this.start + this.remain)
+      if (rect.top < this.lastScrollTop) {
+        console.log('re compute start')
+      }
+    }
+  },
   methods: {
     _handleScroll(offset) {
-      const isUp = offset < this.lastScrollTop
+      this.isUp = offset < this.lastScrollTop
       this.lastScrollTop = offset
       const { start, remain } = this
-      const startRect = this._getItemOffset(start)
 
-      if (isUp) {
+      if (this.isUp) {
         if (!start) {
           return
         }
+        const startRect = this._getItemOffset(start - 1)
         const endRect = this._getItemOffset(start + remain - 1)
         if (endRect.top > offset + this.$el.parentElement.clientHeight) {
           this.style.paddingTop -= startRect.height
@@ -82,6 +96,7 @@ export default {
         if (start + remain >= this.total) {
           return
         }
+        const startRect = this._getItemOffset(start)
         if (startRect.top + startRect.height < offset) {
           this.style.paddingTop += startRect.height
           this.start++
