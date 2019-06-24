@@ -70,15 +70,20 @@ export default {
   },
   methods: {
     _resetStart: debounce(16, function() {
-      const { lastScrollTop, cache, start } = this
+      const { lastScrollTop, cache, start, isSameHeight, height, column } = this
       if (this.isUp) {
-        if (cache[start].top > lastScrollTop) {
-          for (let i = start - 1; i >= 0; i--) {
-            const rect = cache[i]
-            if (rect.top <= lastScrollTop) {
-              this.start = i
-              this.style.paddingTop = rect.top
-              break
+        const curRect = cache[start].top
+        if (curRect.top > lastScrollTop) {
+          if (isSameHeight) {
+            // todo with column
+          } else {
+            for (let i = start - 1; i >= 0; i--) {
+              const rect = cache[i]
+              if (rect.top <= lastScrollTop) {
+                this.start = i
+                this.style.paddingTop = rect.top
+                break
+              }
             }
           }
         }
@@ -87,15 +92,19 @@ export default {
         if (start + remain > total) {
           return
         }
-        const rect = cache[start + remain - 1]
-        if (rect.top + rect.height < lastScrollTop) {
+        const curRect = cache[start + remain - 1]
+        if (curRect.top + curRect.height < lastScrollTop) {
           const parentHeight = this.$el.parentElement.clientHeight
-          for (let i = start + remain; i < total; i++) {
-            const rect = cache[i]
-            if (rect.top + rect.height >= lastScrollTop + parentHeight) {
-              this.start = i
-              this.style.paddingTop = rect.top
-              break
+          if (isSameHeight) {
+            // todo with column
+          } else {
+            for (let i = start + remain; i < total; i++) {
+              const rect = cache[i]
+              if (rect.top + rect.height >= lastScrollTop + parentHeight) {
+                this.start = i
+                this.style.paddingTop = rect.top
+                break
+              }
             }
           }
         }
