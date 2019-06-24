@@ -5,8 +5,15 @@
     :style="containerStyle"
     tag="div"
   >
-    <div v-for="item in filterList" :key="item.id" :style="item._style">
-      <slot name="item" :item="item" />
+    <div
+      v-for="item in filterList"
+      :key="item.id"
+      :style="item._style"
+    >
+      <slot
+        name="item"
+        :item="item"
+      />
     </div>
   </transition-group>
 </template>

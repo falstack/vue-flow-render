@@ -1,3 +1,5 @@
+import { debounce } from 'throttle-debounce'
+
 export default {
   name: 'VueFlowRender',
   props: {
@@ -64,63 +66,90 @@ export default {
     this._computeRenderHeight(this.$slots.default, 0)
   },
   beforeUpdate() {
-    if (this.isUp) {
-      const rect = this._getItemOffset(this.start)
-      if (rect.top + rect.height > this.lastScrollTop) {
-        console.log('re compute start')
-      }
-    } else {
-      const rect = this._getItemOffset(this.start + this.remain)
-      if (rect.top < this.lastScrollTop) {
-        console.log('re compute start')
-      }
-    }
+    this._resetStart()
   },
   methods: {
+    _resetStart: debounce(16, function() {
+      const { lastScrollTop, cache, start } = this
+      if (this.isUp) {
+        if (cache[start].top > lastScrollTop) {
+          for (let i = start - 1; i >= 0; i--) {
+            const rect = cache[i]
+            if (rect.top <= lastScrollTop) {
+              this.start = i
+              this.style.paddingTop = rect.top
+              break
+            }
+          }
+        }
+      } else {
+        const { remain, total } = this
+        if (start + remain > total) {
+          return
+        }
+        const rect = cache[start + remain - 1]
+        if (rect.top + rect.height < lastScrollTop) {
+          const parentHeight = this.$el.parentElement.clientHeight
+          for (let i = start + remain; i < total; i++) {
+            const rect = cache[i]
+            if (rect.top + rect.height >= lastScrollTop + parentHeight) {
+              this.start = i
+              this.style.paddingTop = rect.top
+              break
+            }
+          }
+        }
+      }
+    }),
     _handleScroll(offset) {
       this.isUp = offset < this.lastScrollTop
       this.lastScrollTop = offset
-      const { start, remain } = this
-
+      const { start, remain, cache, total } = this
+      if (start + remain >= total) {
+        return
+      }
       if (this.isUp) {
         if (!start) {
           return
         }
-        const startRect = this._getItemOffset(start - 1)
-        const endRect = this._getItemOffset(start + remain - 1)
+        const startRect = cache[start - 1]
+        const endRect = cache[start + remain - 1]
         if (endRect.top > offset + this.$el.parentElement.clientHeight) {
           this.style.paddingTop -= startRect.height
           this.start--
         }
       } else {
-        if (start + remain >= this.total) {
-          return
-        }
-        const startRect = this._getItemOffset(start)
+        const startRect = cache[start]
         if (startRect.top + startRect.height < offset) {
           this.style.paddingTop += startRect.height
           this.start++
         }
       }
     },
-    _getItemOffset(index) {
-      if (this.isSameHeight) {
-        return this.height * index
-      }
-      return this.cache[index]
-    },
     _computeRenderHeight(items, offset) {
-      const { height, isSameHeight, total, column } = this
+      const { height, isSameHeight, total, column, cache, isSingleColumn } = this
       if (!total) {
         return
       }
       if (isSameHeight) {
-        // 如果指定了高度，那就是说 item 都是相同的固定高度
+        if (isSingleColumn) {
+          for (let i = 0; i < items.length; i++) {
+            cache[i + offset] = {
+              height,
+              top: height * i
+            }
+          }
+        } else {
+          for (let i = 0; i < items.length; i++) {
+            cache[i + offset] = {
+              height,
+              top: height * Math.floor(i / column)
+            }
+          }
+        }
         this.style.height = height * total / column
       } else {
-        // item 的高度必须写在 item 的 style 上
-        const { cache } = this
-        if (this.isSingleColumn) {
+        if (isSingleColumn) {
           let beforeHeight = offset ? cache[offset - 1].top + cache[offset - 1].height : 0
           items.forEach((item, index) => {
             const hgt = +item.data.style.height.replace('px', '')
