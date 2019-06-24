@@ -33,17 +33,8 @@ export default {
     }
   },
   data() {
-    const { column } = this
-    const lineHeight = []
-    if (column !== 1) {
-      for (let i = 0; i < column; i++) {
-        lineHeight.push([])
-      }
-    }
     return {
-      lineHeight,
       lastScrollTop: 0,
-      renderHeight: 0,
       start: 0,
       style: {
         height: 0,
@@ -65,15 +56,16 @@ export default {
       this._handleScroll(val)
     },
     total(newVal, oldVal) {
-      this._computeRenderHeight(this.$slots.default.slice(oldVal, newVal))
+      this._computeRenderHeight(this.$slots.default.slice(oldVal, newVal), oldVal.length)
     }
   },
   mounted() {
-    this._computeRenderHeight(this.$slots.default)
+    this._computeRenderHeight(this.$slots.default, 0)
   },
   methods: {
     _handleScroll(offset) {
       const isUp = offset < this.lastScrollTop
+      this.lastScrollTop = offset
       const { start, remain } = this
       const startRect = this._getItemOffset(start)
 
@@ -83,55 +75,27 @@ export default {
         }
         const endRect = this._getItemOffset(start + remain - 1)
         if (endRect.top > offset + this.$el.parentElement.clientHeight) {
-          this.start--
           this.style.paddingTop -= startRect.height
+          this.start--
         }
       } else {
         if (start + remain >= this.total) {
           return
         }
-        if (startRect.bottom < offset) {
+        if (startRect.top + startRect.height < offset) {
           this.style.paddingTop += startRect.height
           this.start++
         }
       }
-      this.lastScrollTop = offset
     },
     _getItemOffset(index) {
-      if (this.cache[index]) {
-        return this.cache[index]
+      if (this.isSameHeight) {
+        return this.height * index
       }
-
-      let top = 0
-      const { column, isSingleColumn, isSameHeight, height } = this
-
-      if (!index) {
-        top = 0
-      } else if (isSameHeight) {
-        top = height * Math.floor(index / column)
-      } else if (isSingleColumn) {
-        top = this.lineHeight.slice(0, index).reduce((a, b) => a + b)
-      } else {
-        for (let i = 0; i < index; i += column) {
-          top += this.lineHeight[column][i]
-        }
-      }
-
-      const hgt = isSameHeight
-        ? height
-        : isSingleColumn
-          ? this.lineHeight[index]
-          : this.lineHeight[index % column][Math.floor(index / column)]
-      const result = {
-        top,
-        bottom: top + hgt,
-        height: hgt
-      }
-      this.cache[index] = result
-      return result
+      return this.cache[index]
     },
-    _computeRenderHeight(items) {
-      const { height, isSameHeight, isSingleColumn, total, column } = this
+    _computeRenderHeight(items, offset) {
+      const { height, isSameHeight, total, column } = this
       if (!total) {
         return
       }
@@ -140,35 +104,42 @@ export default {
         this.style.height = height * total / column
       } else {
         // item 的高度必须写在 item 的 style 上
-        if (isSingleColumn) {
-          items.forEach(item => {
-            this.lineHeight.push(+item.data.style.height.replace('px', ''))
+        const { cache } = this
+        if (this.isSingleColumn) {
+          let beforeHeight = offset ? cache[offset - 1].top + cache[offset - 1].height : 0
+          items.forEach((item, index) => {
+            const hgt = +item.data.style.height.replace('px', '')
+            cache[index + offset] = {
+              height: hgt,
+              top: beforeHeight
+            }
+            beforeHeight += hgt
           })
-          this.style.height = this.lineHeight.reduce((a, b) => a + b)
+          this.style.height = beforeHeight
         } else {
           items.forEach((item, index) => {
-            this.lineHeight[index % column].push(+item.data.style.height.replace('px', ''))
+            const beforeHeight = offset > column - 1 ? cache[offset - column].top + cache[offset - column].height : 0
+            const hgt = +item.data.style.height.replace('px', '')
+            cache[index + offset] = {
+              height: hgt,
+              top: beforeHeight
+            }
+            if (beforeHeight + hgt > this.style.height) {
+              this.style.height = beforeHeight + hgt
+            }
           })
-          this.style.height = Math.max(...this.lineHeight.map(_ => _.reduce((a, b) => a + b)))
         }
       }
     },
     _filter(h) {
-      const { remain, total, start, isSameHeight } = this
+      const { remain, total, start } = this
       const slots = this.$slots.default
-      let result
 
       if (remain >= total) {
-        result = slots
-      } else {
-        result = slots.slice(start, start + remain)
+        return slots
       }
 
-      this.renderHeight = isSameHeight
-        ? result.length * this.height
-        : result.map(_ => +_.data.style.height.replace('px', '')).reduce((a, b) => a + b)
-
-      return result
+      return slots.slice(start, start + remain)
     }
   },
   render: function(h) {
