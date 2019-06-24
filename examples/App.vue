@@ -72,7 +72,7 @@ export default {
   name: 'App',
   data() {
     return {
-      items: ItemFactory.get(100),
+      items: ItemFactory.get(10000),
       offset: 0
     }
   },
