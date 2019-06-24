@@ -36,6 +36,7 @@ export default {
   },
   data() {
     return {
+      offsetTop: 0,
       lastScrollTop: 0,
       isUp: false,
       start: 0,
@@ -64,15 +65,21 @@ export default {
   },
   mounted() {
     this._computeRenderHeight(this.$slots.default, 0)
+    this.setOffsetTop()
   },
   beforeUpdate() {
     this._resetStart()
   },
   methods: {
+    setOffsetTop(val) {
+      val
+        ? this.offsetTop = val
+        : this.offsetTop = this.$el.getBoundingClientRect().top
+    },
     _resetStart: debounce(16, function() {
-      const { lastScrollTop, cache, start, isSameHeight, height, column } = this
+      const { lastScrollTop, cache, start, isSameHeight, height, column, offsetTop } = this
       const startRect = cache[start]
-      if (startRect.top > lastScrollTop) {
+      if (startRect.top > lastScrollTop + offsetTop) {
         if (isSameHeight) {
           const decreaseCount = Math.ceil((startRect.top - lastScrollTop) / (height * column))
           const decreaseIndex = Math.max(start - decreaseCount, 0)
@@ -96,7 +103,7 @@ export default {
       }
       const endRect = cache[start + remain - 1]
       const parentHeight = this.$el.parentElement.clientHeight
-      if (endRect.top + endRect.height < lastScrollTop + parentHeight) {
+      if (endRect.top + endRect.height < lastScrollTop + parentHeight - offsetTop) {
         if (isSameHeight) {
           const increaseCount = Math.floor((lastScrollTop + parentHeight - endRect.top - endRect.height) / (height * column))
           const increaseIndex = Math.min(start + increaseCount, total - 1)
@@ -118,7 +125,7 @@ export default {
     _handleScroll(offset) {
       this.isUp = offset < this.lastScrollTop
       this.lastScrollTop = offset
-      const { start, remain, cache, total } = this
+      const { start, remain, cache, total, offsetTop } = this
       if (start + remain >= total) {
         return
       }
@@ -128,13 +135,13 @@ export default {
         }
         const startRect = cache[start - 1]
         const endRect = cache[start + remain - 1]
-        if (endRect.top > offset + this.$el.parentElement.clientHeight) {
+        if (endRect.top > offset - offsetTop + this.$el.parentElement.clientHeight) {
           this.style.paddingTop -= startRect.height
           this.start--
         }
       } else {
         const startRect = cache[start]
-        if (startRect.top + startRect.height < offset) {
+        if (startRect.top + startRect.height < offset - offsetTop) {
           this.style.paddingTop += startRect.height
           this.start++
         }
@@ -176,9 +183,10 @@ export default {
           this.style.height = beforeHeight
         } else {
           items.forEach((item, index) => {
-            const beforeHeight = offset > column - 1 ? cache[offset - column].top + cache[offset - column].height : 0
+            const realIndex = index + offset
+            const beforeHeight = realIndex > column - 1 ? cache[realIndex - column].top + cache[realIndex - column].height : 0
             const hgt = +item.data.style.height.replace('px', '')
-            cache[index + offset] = {
+            cache[realIndex] = {
               height: hgt,
               top: beforeHeight
             }

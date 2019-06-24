@@ -18,17 +18,5 @@ module.exports = {
   },
   configureWebpack: {
     plugins: [new webpack.BannerPlugin(banner)]
-  },
-  css: {
-    extract: true,
-    loaderOptions: {
-      postcss: {
-        plugins: [
-          require('postcss-px-to-viewport')({
-            viewportWidth: 375
-          })
-        ]
-      }
-    }
   }
 }
