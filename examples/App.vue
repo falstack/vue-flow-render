@@ -47,7 +47,7 @@
     @scroll="handleScroll"
   >
     <v-render
-      :total="100"
+      :total="1000"
       :remain="10"
       :offset="offset"
     >
@@ -72,7 +72,7 @@ export default {
   name: 'App',
   data() {
     return {
-      items: ItemFactory.get(10000),
+      items: ItemFactory.get(1000),
       offset: 0
     }
   },

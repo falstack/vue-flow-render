@@ -8,7 +8,7 @@ export default new class {
       i
     for (i = 0; i < count; i++) {
       const width = 100 + ~~(Math.random() * 50)
-      const height = 100 + ~~(Math.random() * 30)
+      const height = 50 + ~~(Math.random() * 150)
       items[i] = {
         index: this.lastIndex++,
         id: Math.random().toString(36),
