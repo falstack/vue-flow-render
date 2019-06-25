@@ -39,7 +39,6 @@ export default {
       offsetTop: 0,
       lastScrollTop: 0,
       isUp: false,
-      delta: parseInt(this.remain / 4),
       start: 0,
       style: {
         height: 0,
@@ -102,6 +101,9 @@ export default {
               }
             }
           }
+          if (this.start < 0) {
+            this.start = 0
+          }
         }
       } else {
         const { total } = this
@@ -110,7 +112,7 @@ export default {
         }
         const detectRect = cache[start + remain - 1]
         const offset = lastScrollTop - offsetTop + this.$el.parentElement.clientHeight
-        const deltaHeight = detectRect.top + detectRect.height - offset
+        const deltaHeight = detectRect.bottom - offset
         if (deltaHeight < 0) {
           if (isSameHeight) {
             const increaseCount = Math.floor(deltaHeight / height / column)
@@ -120,12 +122,15 @@ export default {
           } else {
             for (let i = start + remain; i < total; i++) {
               const rect = cache[i]
-              if (rect.top + rect.height >= offset) {
+              if (rect.bottom >= offset) {
                 this.style.paddingTop = rect.top
                 this.start = i
                 break
               }
             }
+          }
+          if (this.start + remain >= total) {
+            this.start = total - remain
           }
         }
       }
@@ -133,29 +138,38 @@ export default {
     _handleScroll(offset) {
       this.isUp = offset < this.lastScrollTop
       this.lastScrollTop = offset
-      const { start, remain, cache, offsetTop, delta, isUp } = this
+      if (!offset) {
+        this.start = 0
+        return
+      }
+      const { start, remain, cache, offsetTop, isUp } = this
       if (isUp) {
         if (!start) {
           return
         }
-        const condition = offset - offsetTop + this.$el.parentElement.clientHeight
+        const condition = offset - offsetTop
         if (
-          cache[start + remain - delta].top > condition ||
+          cache[start + remain - 1].top > condition + this.$el.parentElement.clientHeight ||
           cache[start].top > condition
         ) {
-          this.style.paddingTop -= cache[start - 1].height
+          this.style.paddingTop = cache[start - 1].top
           this.start--
+          if (this.start < 0) {
+            this.start = 0
+          }
         }
       } else {
-        if (start + remain >= this.total) {
+        const { total } = this
+        if (start + remain >= total) {
+          this.start = total - remain
           return
         }
         const condition = offset - offsetTop
         if (
-          cache[start + delta].top < condition ||
-          cache[start + remain - 1].top < condition
+          cache[start].bottom < condition ||
+          cache[start + remain - 1].bottom < condition + this.$el.parentElement.clientHeight
         ) {
-          this.style.paddingTop += cache[start].height
+          this.style.paddingTop = cache[start].top
           this.start++
         }
       }
@@ -168,34 +182,33 @@ export default {
       if (isSameHeight) {
         if (isSingleColumn) {
           for (let i = 0; i < items.length; i++) {
+            const top = height * i
             cache[i + offset] = {
               height,
-              top: height * i
+              top,
+              bottom: height + top
             }
           }
         } else {
           for (let i = 0; i < items.length; i++) {
+            const top = height * Math.floor(i / column)
             cache[i + offset] = {
               height,
-              top: height * Math.floor(i / column)
+              top,
+              bottom: height + top
             }
           }
         }
         this.style.height = height * total / column
       } else {
         if (isSingleColumn) {
-          let beforeHeight
-          if (offset) {
-            const temp = cache[offset - 1]
-            beforeHeight = temp.top + temp.height
-          } else {
-            beforeHeight = 0
-          }
+          let beforeHeight = offset ? cache[offset - 1].bottom : 0
           items.forEach((item, index) => {
             const hgt = +item.data.style.height.replace('px', '')
             cache[index + offset] = {
               height: hgt,
-              top: beforeHeight
+              top: beforeHeight,
+              bottom: hgt + beforeHeight
             }
             beforeHeight += hgt
           })
@@ -204,8 +217,7 @@ export default {
           let offsets
           if (offset) {
             for (let i = offset - column; i <= offset - 1; i++) {
-              const temp = cache[i]
-              offsets.push(temp.top + temp.height)
+              offsets.push(cache[i].bottom)
             }
           } else {
             offsets = new Array(column).fill(0)
@@ -216,7 +228,8 @@ export default {
             const hgt = +item.data.style.height.replace('px', '')
             cache[realIndex] = {
               height: hgt,
-              top: beforeHeight
+              top: beforeHeight,
+              bottom: hgt + beforeHeight
             }
             offsets[offsets.indexOf(beforeHeight)] += hgt
           })

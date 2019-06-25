@@ -30,6 +30,7 @@
       overflow: hidden;
       padding-bottom: 40px;
       box-sizing: border-box;
+      background-color: #fafbfc;
 
       >div {
         position: relative;
