@@ -63,7 +63,7 @@ export default {
   },
   watch: {
     total(newVal, oldVal) {
-      this._computeRenderHeight(this.$slots.default.slice(oldVal, newVal), oldVal.length)
+      this._computeRenderHeight(this.isSameHeight ? undefined : this.$slots.default.slice(oldVal, newVal), oldVal)
     }
   },
   mounted() {
@@ -184,24 +184,13 @@ export default {
         return
       }
       if (isSameHeight) {
-        if (isSingleColumn) {
-          const end = items ? items.length : total - offset
-          for (let i = 0; i < end; i++) {
-            const top = height * i
-            cache[i + offset] = {
-              height,
-              top,
-              bottom: height + top
-            }
-          }
-        } else {
-          for (let i = 0; i < items.length; i++) {
-            const top = height * Math.floor(i / column)
-            cache[i + offset] = {
-              height,
-              top,
-              bottom: height + top
-            }
+        const end = items ? items.length : total - offset
+        for (let i = 0; i < end; i++) {
+          const top = height * Math.floor(i / column)
+          cache[i + offset] = {
+            height,
+            top,
+            bottom: height + top
           }
         }
         this.style.height = height * total / column
