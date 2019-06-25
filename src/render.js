@@ -78,7 +78,7 @@ export default {
         : this.offsetTop = this.$el.getBoundingClientRect().top
     },
     _resetStart: debounce(17, function() {
-      const { lastScrollTop, cache, start, isSameHeight, height, remain, column, offsetTop, delta, isUp } = this
+      const { lastScrollTop, cache, start, isSameHeight, height, remain, column, offsetTop, isUp } = this
       if (isUp) {
         if (!start) {
           return
