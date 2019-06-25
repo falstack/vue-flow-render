@@ -186,7 +186,7 @@ export default {
       if (isSameHeight) {
         const end = items ? items.length : total - offset
         for (let i = 0; i < end; i++) {
-          const top = height * Math.floor(i / column)
+          const top = height * Math.floor((i + offset) / column)
           cache[i + offset] = {
             height,
             top,
