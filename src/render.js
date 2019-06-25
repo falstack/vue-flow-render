@@ -83,9 +83,8 @@ export default {
         if (!start) {
           return
         }
-        const detectRect = cache[start + remain - delta]
-        const parentHeight = this.$el.parentElement.clientHeight
-        const offset = lastScrollTop - offsetTop + parentHeight
+        const detectRect = cache[start]
+        const offset = lastScrollTop - offsetTop
         const deltaHeight = detectRect.top - offset
         if (deltaHeight > 0) {
           if (isSameHeight) {
@@ -109,9 +108,9 @@ export default {
         if (start + remain >= total) {
           return
         }
-        const detectRect = cache[start + delta]
-        const offset = lastScrollTop - offsetTop
-        const deltaHeight = detectRect.top - offset
+        const detectRect = cache[start + remain - 1]
+        const offset = lastScrollTop - offsetTop + this.$el.parentElement.clientHeight
+        const deltaHeight = detectRect.top + detectRect.height - offset
         if (deltaHeight < 0) {
           if (isSameHeight) {
             const increaseCount = Math.floor(deltaHeight / height / column)
@@ -177,7 +176,13 @@ export default {
         this.style.height = height * total / column
       } else {
         if (isSingleColumn) {
-          let beforeHeight = offset ? cache[offset - 1].top + cache[offset - 1].height : 0
+          let beforeHeight
+          if (offset) {
+            const temp = cache[offset - 1]
+            beforeHeight = temp.top + temp.height
+          } else {
+            beforeHeight = 0
+          }
           items.forEach((item, index) => {
             const hgt = +item.data.style.height.replace('px', '')
             cache[index + offset] = {
@@ -188,18 +193,26 @@ export default {
           })
           this.style.height = beforeHeight
         } else {
+          let offsets
+          if (offset) {
+            for (let i = offset - column; i <= offset - 1; i++) {
+              const temp = cache[i]
+              offsets.push(temp.top + temp.height)
+            }
+          } else {
+            offsets = new Array(column).fill(0)
+          }
           items.forEach((item, index) => {
             const realIndex = index + offset
-            const beforeHeight = realIndex > column - 1 ? cache[realIndex - column].top + cache[realIndex - column].height : 0
+            const beforeHeight = Math.min(...offsets)
             const hgt = +item.data.style.height.replace('px', '')
             cache[realIndex] = {
               height: hgt,
               top: beforeHeight
             }
-            if (beforeHeight + hgt > this.style.height) {
-              this.style.height = beforeHeight + hgt
-            }
+            offsets[offsets.indexOf(beforeHeight)] += hgt
           })
+          this.style.height = Math.max(...offsets)
         }
       }
     },

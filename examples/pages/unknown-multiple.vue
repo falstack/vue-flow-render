@@ -109,7 +109,7 @@ export default {
       }
       const { width, column } = this
       const height = item.height * (width / item.width) + 50
-      const columnIndex = index % 2
+      const columnIndex = index < column.length ? index % 2 : column.indexOf(Math.min(...column))
       const top = column[columnIndex]
       this.column[columnIndex] += height
       const result = {
