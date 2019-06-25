@@ -1,5 +1,5 @@
 <style lang="scss">
-#component {
+#foreach {
   position: fixed;
   left: 0;
   top: 0;
@@ -36,7 +36,7 @@
 
 <template>
   <div
-    id="component"
+    id="foreach"
     @scroll="handleScroll"
   >
     <div class="banner">

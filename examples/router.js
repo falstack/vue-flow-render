@@ -12,9 +12,14 @@ export default new VueRouter({
       component: () => import('./pages/index')
     },
     {
-      path: '/known-single',
-      name: 'known-single',
-      component: () => import('./pages/known-single')
+      path: '/known-single-for',
+      name: 'known-single-for',
+      component: () => import('./pages/known-single-for')
+    },
+    {
+      path: '/known-single-prop',
+      name: 'known-single-prop',
+      component: () => import('./pages/known-single-prop')
     },
     {
       path: '/unknown-single',
