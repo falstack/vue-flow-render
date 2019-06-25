@@ -138,11 +138,11 @@ export default {
     _handleScroll(offset) {
       this.isUp = offset < this.lastScrollTop
       this.lastScrollTop = offset
-      if (!offset) {
+      const { start, remain, cache, offsetTop, isUp } = this
+      if (offset - offsetTop <= 0) {
         this.start = 0
         return
       }
-      const { start, remain, cache, offsetTop, isUp } = this
       if (isUp) {
         if (!start) {
           return
@@ -152,7 +152,7 @@ export default {
           cache[start + remain - 1].top > condition + this.$el.parentElement.clientHeight ||
           cache[start].top > condition
         ) {
-          this.style.paddingTop = cache[start - 1].top
+          this.style.paddingTop -= cache[start - 1].height
           this.start--
           if (this.start < 0) {
             this.start = 0
@@ -169,7 +169,7 @@ export default {
           cache[start].bottom < condition ||
           cache[start + remain - 1].bottom < condition + this.$el.parentElement.clientHeight
         ) {
-          this.style.paddingTop = cache[start].top
+          this.style.paddingTop += cache[start].height
           this.start++
         }
       }
@@ -238,14 +238,18 @@ export default {
       }
     },
     _filter(h) {
-      const { remain, total, start } = this
-      const slots = this.$slots.default
+      const { remain, total, start, item, getter } = this
+      const end = remain >= total ? total : start + remain
 
-      if (remain >= total) {
-        return slots
+      if (item) {
+        const result = []
+        for (let i = start; i < end; i++) {
+          result.push(h(item, getter(i)))
+        }
+        return result
       }
 
-      return slots.slice(start, start + remain)
+      return this.$slots.default.slice(start, end)
     }
   },
   render: function(h) {
