@@ -45,7 +45,8 @@ import VueFlowRender from 'vue-flow-render'
 ## 方法
 > 通过 ref 来拿到组件，然后调用组件的方法
 1. `this.$refs.render.scroll(scrollEvt.target.offsetTop)`
-组件不会自己滚动，需要在外层容器滚动的时候将`evt.target.offsetTop`传递到 scroll 函数里，如果使用的是`better-scroll`，则再其`scroll`回调里拿到`-Y`
+组件不会自己滚动，需要在外层容器滚动的时候将`evt.target.offsetTop`传递到 scroll 函数里
+scroll 函数的第二个参数是 isUp（是否向上滑动，默认可不传）
 
 2. `this.$refs.render.setOffsetTop()`
 容器的上面如果存在动态高度的元素，那么当其高度变化后，调用 setOffsetTop 函数

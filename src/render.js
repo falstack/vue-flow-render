@@ -77,8 +77,8 @@ export default {
     setOffsetTop() {
       this.offsetTop = getOffsetTop(this.$el)
     },
-    scroll(offset) {
-      this.isUp = offset < this.lastScrollTop
+    scroll(offset, up) {
+      this.isUp = up === undefined ? offset < this.lastScrollTop : up
       this.lastScrollTop = offset
       const { start, remain, cache, offsetTop, isUp } = this
       if (offset - offsetTop <= 0) {
