@@ -39,6 +39,7 @@ export default {
       offsetTop: 0,
       lastScrollTop: 0,
       isUp: false,
+      delta: parseInt(this.remain / 4),
       start: 0,
       style: {
         height: 0,
@@ -76,47 +77,55 @@ export default {
         ? this.offsetTop = val
         : this.offsetTop = this.$el.getBoundingClientRect().top
     },
-    _resetStart: debounce(16, function() {
-      const { lastScrollTop, cache, start, isSameHeight, height, column, offsetTop } = this
-      const startRect = cache[start]
-      if (startRect.top > lastScrollTop + offsetTop) {
-        if (isSameHeight) {
-          const decreaseCount = Math.ceil((startRect.top - lastScrollTop) / (height * column))
-          const decreaseIndex = Math.max(start - decreaseCount, 0)
-          const decreaseRect = cache[decreaseIndex]
-          this.start = decreaseIndex
-          this.style.paddingTop = decreaseRect.top
-        } else {
-          for (let i = start - 1; i >= 0; i--) {
-            const rect = cache[i]
-            if (rect.top <= lastScrollTop) {
-              this.start = i
-              this.style.paddingTop = rect.top
-              break
+    _resetStart: debounce(17, function() {
+      const { lastScrollTop, cache, start, isSameHeight, height, remain, column, offsetTop, delta, isUp } = this
+      if (isUp) {
+        if (!start) {
+          return
+        }
+        const detectRect = cache[start + remain - delta]
+        const parentHeight = this.$el.parentElement.clientHeight
+        const offset = lastScrollTop - offsetTop + parentHeight
+        const deltaHeight = detectRect.top - offset
+        if (deltaHeight > 0) {
+          if (isSameHeight) {
+            const decreaseCount = Math.ceil(deltaHeight / height / column)
+            const resultStart = Math.max(start - decreaseCount, 0)
+            this.start = resultStart
+            this.style.paddingTop = cache[resultStart]
+          } else {
+            for (let i = start - 1; i >= 0; i--) {
+              const rect = cache[i]
+              if (rect.top <= offset) {
+                this.style.paddingTop = rect.top
+                this.start = i
+                break
+              }
             }
           }
         }
-      }
-      const { remain, total } = this
-      if (start + remain > total) {
-        return
-      }
-      const endRect = cache[start + remain - 1]
-      const parentHeight = this.$el.parentElement.clientHeight
-      if (endRect.top + endRect.height < lastScrollTop + parentHeight - offsetTop) {
-        if (isSameHeight) {
-          const increaseCount = Math.floor((lastScrollTop + parentHeight - endRect.top - endRect.height) / (height * column))
-          const increaseIndex = Math.min(start + increaseCount, total - 1)
-          const increaseRect = cache[increaseIndex]
-          this.start = increaseIndex
-          this.style.paddingTop = increaseRect.top
-        } else {
-          for (let i = start + remain; i < total; i++) {
-            const rect = cache[i]
-            if (rect.top + rect.height >= lastScrollTop + parentHeight) {
-              this.start = i
-              this.style.paddingTop = rect.top
-              break
+      } else {
+        const { total } = this
+        if (start + remain >= total) {
+          return
+        }
+        const detectRect = cache[start + delta]
+        const offset = lastScrollTop - offsetTop
+        const deltaHeight = detectRect.top - offset
+        if (deltaHeight < 0) {
+          if (isSameHeight) {
+            const increaseCount = Math.floor(deltaHeight / height / column)
+            const resultStart = Math.min(start + increaseCount, total - 1)
+            this.start = resultStart
+            this.style.paddingTop = cache[resultStart]
+          } else {
+            for (let i = start + remain; i < total; i++) {
+              const rect = cache[i]
+              if (rect.top + rect.height >= offset) {
+                this.style.paddingTop = rect.top
+                this.start = i
+                break
+              }
             }
           }
         }
@@ -125,24 +134,21 @@ export default {
     _handleScroll(offset) {
       this.isUp = offset < this.lastScrollTop
       this.lastScrollTop = offset
-      const { start, remain, cache, total, offsetTop } = this
-      if (start + remain >= total) {
-        return
-      }
-      if (this.isUp) {
+      const { start, remain, cache, offsetTop, delta, isUp } = this
+      if (isUp) {
         if (!start) {
           return
         }
-        const startRect = cache[start - 1]
-        const endRect = cache[start + remain - 1]
-        if (endRect.top > offset - offsetTop + this.$el.parentElement.clientHeight) {
-          this.style.paddingTop -= startRect.height
+        if (cache[start + remain - delta].top > offset - offsetTop + this.$el.parentElement.clientHeight) {
+          this.style.paddingTop -= cache[start - 1].height
           this.start--
         }
       } else {
-        const startRect = cache[start]
-        if (startRect.top + startRect.height < offset - offsetTop) {
-          this.style.paddingTop += startRect.height
+        if (start + remain >= this.total) {
+          return
+        }
+        if (cache[start + delta].top < offset - offsetTop) {
+          this.style.paddingTop += cache[start].height
           this.start++
         }
       }
