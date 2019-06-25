@@ -138,7 +138,11 @@ export default {
         if (!start) {
           return
         }
-        if (cache[start + remain - delta].top > offset - offsetTop + this.$el.parentElement.clientHeight) {
+        const condition = offset - offsetTop + this.$el.parentElement.clientHeight
+        if (
+          cache[start + remain - delta].top > condition ||
+          cache[start].top > condition
+        ) {
           this.style.paddingTop -= cache[start - 1].height
           this.start--
         }
@@ -146,7 +150,11 @@ export default {
         if (start + remain >= this.total) {
           return
         }
-        if (cache[start + delta].top < offset - offsetTop) {
+        const condition = offset - offsetTop
+        if (
+          cache[start + delta].top < condition ||
+          cache[start + remain - 1].top < condition
+        ) {
           this.style.paddingTop += cache[start].height
           this.start++
         }
