@@ -75,10 +75,12 @@ export default {
       const { start, remain, cache, offsetTop, isUp } = this
       if (offset - offsetTop <= 0) {
         this.start = 0
+        this.style.paddingTop = 0
         return
       }
       if (isUp) {
         if (this.start <= 0) {
+          this.style.paddingTop = 0
           this.start = 0
           return
         }
@@ -97,6 +99,7 @@ export default {
         const { total } = this
         if (start + remain >= total) {
           this.start = total - remain
+          this.style.paddingTop = cache[total - remain].top
           return
         }
         const condition = offset - offsetTop
@@ -110,10 +113,11 @@ export default {
       }
     },
     _resetStart: debounce(17, function() {
-      const { lastScrollTop, cache, start, isSameHeight, height, remain, column, offsetTop, isUp } = this
-      if (isUp) {
+      const { lastScrollTop, cache, start, isSameHeight, height, remain, column, offsetTop } = this
+      const resetUp = () => {
         if (this.start <= 0) {
           this.start = 0
+          this.style.paddingTop = 0
           return
         }
         const detectRect = cache[start]
@@ -135,10 +139,12 @@ export default {
             }
           }
         }
-      } else {
+      }
+      const resetDown = () => {
         const { total } = this
         if (start + remain >= total) {
           this.start = total - remain
+          this.style.paddingTop = cache[total - remain].top
           return
         }
         const detectRect = cache[start + remain - 1]
@@ -161,6 +167,8 @@ export default {
           }
         }
       }
+      resetUp()
+      resetDown()
     }),
     _computeRenderHeight(items, offset) {
       const { height, isSameHeight, total, column, cache, isSingleColumn } = this
