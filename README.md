@@ -48,5 +48,8 @@ import VueFlowRender from 'vue-flow-render'
 组件不会自己滚动，需要在外层容器滚动的时候将`evt.target.offsetTop`传递到 scroll 函数里
 scroll 函数的第二个参数是 isUp（是否向上滑动，默认可不传）
 
-2. `this.$refs.render.setOffsetTop()`
-容器的上面如果存在动态高度的元素，那么当其高度变化后，调用 setOffsetTop 函数
+2. `this.$refs.render.setOffset()`
+如果容器的上面存在动态高度的元素，那么当其高度变化后，调用`setOffset`函数
+
+3. `this.$refs.render.setWrap(el)`
+如果使用`better-scroll`，那么你要把 render 的 wrap 设置为`better-scroll`的父容器

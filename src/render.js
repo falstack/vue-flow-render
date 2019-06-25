@@ -1,15 +1,3 @@
-import { debounce } from 'throttle-debounce'
-
-const getOffsetTop = elem => {
-  let offsetTop = 0
-  do {
-    if (!isNaN(elem.offsetTop)) {
-      offsetTop += elem.offsetTop
-    }
-  } while ((elem = elem.offsetParent))
-  return offsetTop
-}
-
 export default {
   name: 'VueFlowRender',
   props: {
@@ -42,6 +30,7 @@ export default {
   },
   data() {
     return {
+      wrap: null,
       offsetTop: 0,
       lastScrollTop: 0,
       isUp: false,
@@ -67,15 +56,19 @@ export default {
     }
   },
   mounted() {
+    this.setOffset()
+    this.setWrap()
     this._computeRenderHeight(this.$slots.default, 0)
-    this.setOffsetTop()
   },
   beforeUpdate() {
     this._resetStart()
   },
   methods: {
-    setOffsetTop() {
-      this.offsetTop = getOffsetTop(this.$el)
+    setOffset() {
+      this.offsetTop = this.$el.offsetTop
+    },
+    setWrap(el) {
+      this.wrap = el || this.$el.parentElement
     },
     scroll(offset, up) {
       this.isUp = up === undefined ? offset < this.lastScrollTop : up
@@ -94,7 +87,7 @@ export default {
         }
         const condition = offset - offsetTop
         if (
-          cache[start + remain - 1].top > condition + this.$el.parentElement.clientHeight ||
+          cache[start + remain - 1].top > condition + this.wrap.clientHeight ||
           cache[start].top > condition
         ) {
           this.style.paddingTop -= cache[start - 1].height
@@ -113,17 +106,17 @@ export default {
         const condition = offset - offsetTop
         if (
           cache[start].bottom < condition ||
-          cache[start + remain - 1].bottom < condition + this.$el.parentElement.clientHeight
+          cache[start + remain - 1].bottom < condition + this.wrap.clientHeight
         ) {
           this.style.paddingTop += cache[start].height
           this.start++
         }
       }
     },
-    _resetStart: debounce(17, function() {
-      const { lastScrollTop, cache, start, isSameHeight, height, remain, column, offsetTop } = this
+    _resetStart() {
+      const { lastScrollTop, cache, start, isSameHeight, height, remain, column, offsetTop, total } = this
       const resetUp = () => {
-        if (this.start <= 0) {
+        if (start <= 0) {
           this.start = 0
           this.style.paddingTop = 0
           return
@@ -149,14 +142,13 @@ export default {
         }
       }
       const resetDown = () => {
-        const { total } = this
         if (start + remain >= total) {
           this.start = total - remain
           this.style.paddingTop = cache[total - remain].top
           return
         }
         const detectRect = cache[start + remain - 1]
-        const offset = lastScrollTop - offsetTop + this.$el.parentElement.clientHeight
+        const offset = lastScrollTop - offsetTop + this.wrap.clientHeight
         const deltaHeight = detectRect.bottom - offset
         if (deltaHeight < 0) {
           if (isSameHeight) {
@@ -177,7 +169,7 @@ export default {
       }
       resetUp()
       resetDown()
-    }),
+    },
     _computeRenderHeight(items, offset) {
       const { height, isSameHeight, total, column, cache, isSingleColumn } = this
       if (!total) {
