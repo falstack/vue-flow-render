@@ -1,14 +1,6 @@
 # vue-flow-render
 
-一个 vue 的列表惰性加载组件
-
-## feature
-```markdown
-1. 支持百分比宽度，vw
-2. 支持DOM的惰性填充
-3. 暂不支持 resize
-4. 暂不支持重排序
-```
+一个 vue 的列表惰性渲染容器组件
 
 ## download
 ```shell
@@ -21,78 +13,39 @@ npm install vue-flow-render
 
 ## usage
 ```javascript
-import FlowRender from 'vue-flow-render'
-```
-```vue
-components: {
-  FlowRender
-}
-```
-```html
-<template>
-  <FlowRender
-    line-width="50%"
-    :line-count="2"
-    :margin-bottom="10"
-    :margin-right="10"
-    :extra-height="40"
-    :vw-viewport="375"
-    :max-height="800"
-    :list="items"
-    transition="fade"
-  >
-    <div slot-scope="{ item }" slot="item" class="demo">
-      <div
-        :style="{
-          backgroundColor: item.style.color,
-          backgroundImage: `url(${item.style.image})`,
-          paddingTop: `${(item.height / item.width) * 100}%`
-        }"
-        class="image"
-      />
-      <div class="panel">{{ item.index }}</div>
-    </div>
-  </FlowRender>
-</template>
-```
-## waterfall args
-| key | value | meaning | required |
-| ------ | ------ | ------ | ------ |
-| line-width | Number, px, %, vw | 每行的宽度 | Y |
-| line-count | Number, >= 1 | 瀑布流的行数 | Y |
-| margin-bottom | Number, >= 0 | 每个块的上下间距 | N |
-| margin-right | Number, >= 0 | 每行的间距 | N | 
-| extra-height | Number, >= 0 | 出去图片外的 DOM 的高度 | N |
-| vw-viewport | Number, >= 0 | vw 模式下的视口宽度 | N |
-| max-height | Number, >= 0 | 每个块的最大高度 | N | 
-| lazy-scale | Number, >= 1 | 懒加载的比率 | N |
-| transition | String | 每个块的渐变动画 | N |
-| list | Array | 要渲染的数据数组 | Y |
-
-## Project setup
-```
-yarn install
+import VueFlowRender from 'vue-flow-render'
 ```
 
-### Compiles and hot-reloads for development
-```
-yarn run dev
+## 参数
+| key | value | description | required | validator |
+| ------ | ------ | ------ | ------ | --- |
+| remain | Number | 列表里保留的 item 的 DOM 个数 | Y | >= 0 |
+| total | Number | item 的总数 | Y | >= 0 | 
+| column | Number | 列表的列数，默认是1列，多列为瀑布流 | N | >= 1 |
+| height | Number | 每个 item 的高度，如果为不定高度的组件，则不填 | N | >= 0 |
+| item | VueComponent | 如果 item 为单一固定高度的，则可以把 item 组件传过来 | N | - |
+| getter | Function | 如果传了 item 的组件，则 getter 方法用来获取 item 的属性，调用 getter 方法的传参是 index | N | - |
+
+
+> PS：如果 item 的高度为不固定的，必须在 item 的 style 上设置高度，单位为 px，如：
+```Vue
+<vue-flow-render
+  ref="render"
+  :total="1000"
+  :remain="10"
+>
+  <item
+    v-for="(item, index) in items"
+    :key="index"
+    :style="{ height: `${item.height}px` }"
+  />
+</vue-flow-render>
 ```
 
-### Compiles and minifies for production
-```
-yarn run build
-```
+## 方法
+> 通过 ref 来拿到组件，然后调用组件的方法
+1. `this.$refs.render.scroll(scrollEvt.target.offsetTop)`
+组件不会自己滚动，需要在外层容器滚动的时候将`evt.target.offsetTop`传递到 scroll 函数里，如果使用的是`better-scroll`，则再其`scroll`回调里拿到`-Y`
 
-### Lints and fixes files
-```
-yarn run lint
-```
-
-### Run your unit tests（nothing）
-```
-yarn run test:unit
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+2. `this.$refs.render.setOffsetTop()`
+容器的上面如果存在动态高度的元素，那么当其高度变化后，调用 setOffsetTop 函数

@@ -1,5 +1,15 @@
 import { debounce } from 'throttle-debounce'
 
+const getOffsetTop = elem => {
+  let offsetTop = 0
+  do {
+    if (!isNaN(elem.offsetTop)) {
+      offsetTop += elem.offsetTop
+    }
+  } while ((elem = elem.offsetParent))
+  return offsetTop
+}
+
 export default {
   name: 'VueFlowRender',
   props: {
@@ -64,10 +74,8 @@ export default {
     this._resetStart()
   },
   methods: {
-    setOffsetTop(val) {
-      val
-        ? this.offsetTop = val
-        : this.offsetTop = this.$el.getBoundingClientRect().top
+    setOffsetTop() {
+      this.offsetTop = getOffsetTop(this.$el)
     },
     scroll(offset) {
       this.isUp = offset < this.lastScrollTop
