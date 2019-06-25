@@ -60,10 +60,10 @@
     @scroll="handleScroll"
   >
     <v-render
+      ref="render"
       :total="1000"
       :remain="16"
       :column="2"
-      :offset="offset"
     >
       <div
         v-for="(item, index) in items"
@@ -95,14 +95,13 @@ export default {
     return {
       items: this.$factory.get(1000),
       width: (window.screen.width - 20) / 2 - 5,
-      offset: 0,
       column: [0, 0],
       cache: {}
     }
   },
   methods: {
     handleScroll(evt) {
-      this.offset = evt.target.scrollTop
+      this.$refs.render.scroll(evt.target.scrollTop)
     },
     getItemStyle(item, index) {
       if (this.cache[index]) {

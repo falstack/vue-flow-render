@@ -12,6 +12,11 @@ export default new VueRouter({
       component: () => import('./pages/index')
     },
     {
+      path: '/known-single',
+      name: 'known-single',
+      component: () => import('./pages/known-single')
+    },
+    {
       path: '/unknown-single',
       name: 'unknown-single',
       component: () => import('./pages/unknown-single')

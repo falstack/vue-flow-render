@@ -1,5 +1,5 @@
 <style lang="scss">
-#single {
+#component {
   position: fixed;
   left: 0;
   top: 0;
@@ -19,6 +19,7 @@
   .demo {
     box-sizing: border-box;
     padding: 0 15px 15px;
+    height: 100px;
 
     div {
       display: flex;
@@ -35,7 +36,7 @@
 
 <template>
   <div
-    id="single"
+    id="component"
     @scroll="handleScroll"
   >
     <div class="banner">
@@ -45,11 +46,13 @@
       ref="render"
       :total="1000"
       :remain="10"
+      :height="100"
+      :item="item"
+      :getter="getProps"
     >
       <div
         v-for="(item, index) in items"
         :key="index"
-        :style="{ height: `${item.height}px` }"
         class="demo"
       >
         <div :style="{ backgroundColor: item.style.color }">
@@ -61,16 +64,27 @@
 </template>
 
 <script>
+import Item from '../Item'
+
 export default {
   name: 'UnknownSingle',
   data() {
     return {
-      items: this.$factory.get(1000)
+      items: this.$factory.get(1000),
+      item: Item
     }
   },
   methods: {
     handleScroll(evt) {
       this.$refs.render.scroll(evt.target.scrollTop)
+    },
+    getProps(index) {
+      return {
+        props: {
+          item: this.items[index],
+          index
+        }
+      }
     }
   }
 }
