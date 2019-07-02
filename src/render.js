@@ -70,6 +70,9 @@ export default {
     setWrap(el) {
       this.wrap = el || this.$el.parentElement
     },
+    getRect(index) {
+      return this.cache[index]
+    },
     scroll(offset, up) {
       this.isUp = up === undefined ? offset < this.lastScrollTop : up
       this.lastScrollTop = offset
