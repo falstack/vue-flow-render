@@ -254,7 +254,8 @@ export default {
       'style': {
         boxSizing: 'border-box',
         height: `${height}px`,
-        paddingTop: `${paddingTop}px`
+        paddingTop: `${paddingTop}px`,
+        willChange: 'padding-top'
       },
       'class': 'vue-flow-render'
     }, list)
