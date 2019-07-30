@@ -46,13 +46,11 @@
       ref="render"
       :total="1000"
       :remain="10"
-      :height="100"
-      :item="item"
-      :getter="getProps"
     >
       <div
         v-for="(item, index) in items"
         :key="index"
+        :style="{ height: '100px' }"
         class="demo"
       >
         <div :style="{ backgroundColor: item.style.color }">

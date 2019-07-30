@@ -1,6 +1,6 @@
 {
   "name": "vue-flow-render",
-  "version": "0.1.27",
+  "version": "0.1.28",
   "main": "dist/vue-flow-render.umd.min.js",
   "files": [
     "dist"
@@ -29,22 +29,22 @@
     "vue": "^2.6.10"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^3.8.0",
-    "@vue/cli-plugin-eslint": "^3.8.0",
-    "@vue/cli-plugin-unit-jest": "^3.8.0",
-    "@vue/cli-service": "^3.8.4",
-    "@vue/eslint-config-prettier": "^4.0.1",
+    "@vue/cli-plugin-babel": "^3.9.2",
+    "@vue/cli-plugin-eslint": "^3.9.2",
+    "@vue/cli-plugin-unit-jest": "^3.9.0",
+    "@vue/cli-service": "^3.9.3",
+    "@vue/eslint-config-prettier": "^5.0.0",
     "@vue/test-utils": "1.0.0-beta.29",
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "^10.0.2",
     "babel-jest": "^24.8.0",
-    "eslint": "^5.8.0",
-    "eslint-plugin-vue": "^5.0.0",
+    "eslint": "^6.1.0",
+    "eslint-plugin-vue": "^5.2.3",
     "node-sass": "^4.12.0",
-    "postcss-px-to-viewport": "^1.1.0",
+    "postcss-px-to-viewport": "^1.1.1",
     "sass-loader": "^7.1.0",
     "throttle-debounce": "^2.1.0",
-    "vue-router": "^3.0.6",
+    "vue-router": "^3.0.7",
     "vue-template-compiler": "^2.6.10"
   }
 }

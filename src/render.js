@@ -243,6 +243,10 @@ export default {
         return result
       }
 
+      if (!this.$slots.default) {
+        return []
+      }
+
       return this.$slots.default.slice(start, end)
     }
   },
