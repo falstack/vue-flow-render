@@ -56,3 +56,6 @@ scroll 函数的第二个参数是 isUp（是否向上滑动，默认可不传�
 
 4. `this.$refs.render.getRect(index)`
 使用这个组件后，浏览器自带的`Ctrl + F`搜索就无法正常使用，请自行实现搜索功能，然后通过该方法获取到指定元素的 rect，再让容器滚动到指定位置
+
+5. `this.$refs.render.clear()`
+刷新页面的时候，调用该方法清空缓存

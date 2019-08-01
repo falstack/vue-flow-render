@@ -53,9 +53,9 @@ export default {
   watch: {
     total(newVal, oldVal) {
       if (!newVal) {
-        this._clear()
+        this.clear()
       } else if (newVal < oldVal) {
-        this._clear()
+        this.clear()
         this._computeRenderHeight(this.$slots.default, 0)
       } else {
         this._computeRenderHeight(this.isSameHeight ? undefined : this.$slots.default.slice(oldVal, newVal), oldVal)
@@ -125,7 +125,7 @@ export default {
         }
       }
     },
-    _clear() {
+    clear() {
       this.style = {
         height: 0,
         paddingTop: 0
