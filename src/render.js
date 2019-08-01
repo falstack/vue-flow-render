@@ -210,6 +210,7 @@ export default {
         } else {
           let offsets
           if (offset) {
+            offsets = []
             for (let i = offset - column; i <= offset - 1; i++) {
               offsets.push(cache[i].bottom)
             }
