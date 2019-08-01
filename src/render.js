@@ -52,7 +52,14 @@ export default {
   },
   watch: {
     total(newVal, oldVal) {
-      this._computeRenderHeight(this.isSameHeight ? undefined : this.$slots.default.slice(oldVal, newVal), oldVal)
+      if (!newVal) {
+        this._clear()
+      } else if (newVal < oldVal) {
+        this._clear()
+        this._computeRenderHeight(this.$slots.default, 0)
+      } else {
+        this._computeRenderHeight(this.isSameHeight ? undefined : this.$slots.default.slice(oldVal, newVal), oldVal)
+      }
     }
   },
   mounted() {
@@ -117,6 +124,13 @@ export default {
           this.start++
         }
       }
+    },
+    _clear() {
+      this.style = {
+        height: 0,
+        paddingTop: 0
+      }
+      this.cache = {}
     },
     _resetStart() {
       const { lastScrollTop, cache, start, isSameHeight, height, remain, column, offsetTop, total } = this
@@ -247,7 +261,6 @@ export default {
       if (!this.$slots.default) {
         return []
       }
-
       return this.$slots.default.slice(start, end)
     }
   },
