@@ -1,3 +1,5 @@
+import { debounce } from 'throttle-debounce'
+
 export default {
   name: 'VueFlowRender',
   props: {
@@ -31,6 +33,7 @@ export default {
   data() {
     return {
       wrap: null,
+      wrapHeight: 0,
       offsetTop: 0,
       lastScrollTop: 0,
       isUp: false,
@@ -60,6 +63,7 @@ export default {
       } else {
         this._computeRenderHeight(this.isSameHeight ? undefined : this.$slots.default.slice(oldVal, newVal), oldVal)
       }
+      this.wrapHeight = this.wrap.clientHeight
     }
   },
   mounted() {
@@ -67,15 +71,13 @@ export default {
     this.setWrap()
     this._computeRenderHeight(this.$slots.default, 0)
   },
-  beforeUpdate() {
-    this._resetStart()
-  },
   methods: {
     setOffset() {
       this.offsetTop = this.$el.offsetTop
     },
     setWrap(el) {
       this.wrap = el || this.$el.parentElement
+      this.wrapHeight = this.wrap.clientHeight
     },
     getRect(index) {
       return this.cache[index]
@@ -83,47 +85,70 @@ export default {
     scroll(offset, up) {
       this.isUp = up === undefined ? offset < this.lastScrollTop : up
       this.lastScrollTop = offset
-      const { start, remain, cache, offsetTop, isUp, total } = this
+      const { start, remain, cache, offsetTop, isUp, total, wrapHeight } = this
+      /**
+       * 元素比较少，还不需要懒加载
+       */
       if (remain >= total) {
         return
       }
+      /**
+       * 位移修正（iOS offset 可能为负值）
+       */
       if (offset - offsetTop <= 0) {
         this.start = 0
         this.style.paddingTop = 0
         return
       }
+      /**
+       * 实际的滚动的高度要减去 offset
+       */
+      const scrollTop = offset - offsetTop
+      /**
+       * 向上
+       */
       if (isUp) {
+        /**
+         * 触顶，数值修正
+         */
         if (this.start <= 0) {
           this.style.paddingTop = 0
           this.start = 0
           return
         }
-        const condition = offset - offsetTop
+        /**
+         * 1. 当前列表最后一个元素的顶部已经离开视口
+         * 2. 当前列表的第一个元素的顶部已经进入视口
+         */
         if (
-          cache[start + remain - 1].top > condition + this.wrap.clientHeight ||
-          cache[start].top > condition
+          cache[start + remain - 1].top > scrollTop + wrapHeight ||
+          cache[start].top > scrollTop
         ) {
           this.style.paddingTop -= cache[start - 1].height
           this.start--
-          if (this.start < 0) {
-            this.start = 0
-          }
         }
       } else {
+        /**
+         * 触底，数值修正
+         */
         if (start + remain >= total) {
           this.start = total - remain
           this.style.paddingTop = cache[total - remain].top
           return
         }
-        const condition = offset - offsetTop
+        /**
+         * 1. 当前列表的第一个元素的底部已经离开视口
+         * 2. 当前列表的最后一个元素底部已经进入视口
+         */
         if (
-          cache[start].bottom < condition ||
-          cache[start + remain - 1].bottom < condition + this.wrap.clientHeight
+          cache[start].bottom < scrollTop ||
+          cache[start + remain - 1].bottom < scrollTop + wrapHeight
         ) {
           this.style.paddingTop += cache[start].height
           this.start++
         }
       }
+      this._adjustStart()
     },
     clear() {
       this.style = {
@@ -132,66 +157,103 @@ export default {
       }
       this.cache = {}
     },
-    _resetStart() {
-      const { lastScrollTop, cache, start, isSameHeight, height, remain, column, offsetTop, total } = this
-      if (remain >= total) {
-        return
-      }
-      const resetUp = () => {
-        if (start <= 0) {
-          this.start = 0
+    _adjustStart: debounce(100, function() {
+      const { lastScrollTop, cache, start, isSameHeight, height, remain, column, offsetTop, total, wrapHeight } = this
+      /**
+       * 向上修正
+       */
+      const adjustUp = () => {
+        const detectRect = cache[start]
+        const scrollTop = lastScrollTop - offsetTop
+        /**
+         * 如果在顶部，则直接修正
+         */
+        if (scrollTop === 0) {
           this.style.paddingTop = 0
+          this.start = 0
           return
         }
-        const detectRect = cache[start]
-        const offset = lastScrollTop - offsetTop
-        const deltaHeight = detectRect.top - offset
-        if (deltaHeight > 0) {
-          if (isSameHeight) {
-            const decreaseCount = Math.abs(Math.ceil(deltaHeight / height / column))
-            this.start = Math.max(start - decreaseCount, 0)
-            this.style.paddingTop -= decreaseCount * height
-          } else {
-            for (let i = start - 1; i >= 0; i--) {
-              const rect = cache[i]
-              if (rect.top <= offset) {
-                this.style.paddingTop = rect.top
-                this.start = i
-                break
-              }
+        const deltaHeight = detectRect.top - scrollTop
+        /**
+         * 如果当前列表的第一个元素的顶部在视口的上方，则不用修正
+         */
+        if (deltaHeight <= 0) {
+          return
+        }
+        if (isSameHeight) {
+          /**
+           * 如果元素是等高的，直接根据高度差算出需要修正的距离
+           */
+          const decreaseCount = Math.abs(Math.ceil(deltaHeight / height / column))
+          this.start -= decreaseCount
+          this.style.paddingTop -= decreaseCount * height
+        } else {
+          /**
+           * 如果元素不等高
+           * 从当前列表的上一个元素开始，到第 0 个元素结束开始循环
+           * 寻找第一个顶部在视口边界的元素
+           */
+          for (let i = start - 1; i >= 0; i--) {
+            if (cache[i].top <= scrollTop) {
+              const index = Math.max(i - (remain / 2 | 0), 0)
+              this.style.paddingTop = cache[index].top
+              this.start = index
+              break
             }
           }
         }
       }
-      const resetDown = () => {
-        if (start + remain >= total) {
+      /**
+       * 向下修正
+       */
+      const adjustDown = () => {
+        const detectRect = cache[start + remain - 1]
+        const scrollBottom = lastScrollTop - offsetTop + wrapHeight
+        /**
+         * 如果触底了，则直接修正
+         */
+        if (scrollBottom === cache[total - 1].bottom) {
           this.start = total - remain
           this.style.paddingTop = cache[total - remain].top
           return
         }
-        const detectRect = cache[start + remain - 1]
-        const offset = lastScrollTop - offsetTop + this.wrap.clientHeight
-        const deltaHeight = detectRect.bottom - offset
-        if (deltaHeight < 0) {
-          if (isSameHeight) {
-            const increaseCount = Math.abs(Math.floor(deltaHeight / height / column))
-            this.start = Math.min(start + increaseCount, total - remain)
-            this.style.paddingTop += increaseCount * height
-          } else {
-            for (let i = start + remain; i <= total - remain; i++) {
-              const rect = cache[i]
-              if (rect.bottom >= offset) {
-                this.style.paddingTop = rect.top
-                this.start = i
-                break
-              }
+        /**
+         * 如果当前列表的最后一个元素的底部在视口的下方，则不用修正
+         */
+        const deltaHeight = detectRect.bottom - scrollBottom
+        if (deltaHeight >= 0) {
+          return
+        }
+        if (isSameHeight) {
+          /**
+           * 如果元素是等高的，直接根据高度差算出需要修正的距离
+           */
+          const increaseCount = Math.abs(Math.floor(deltaHeight / height / column))
+          this.start += increaseCount
+          this.style.paddingTop += increaseCount * height
+        } else {
+          /**
+           * 如果元素不等高
+           * 从最后一个元素的下一个元素开始，到最后一个元素开始循环
+           * 寻找第一个底部在视口边界的元素
+           */
+          for (let i = start + remain; i < total; i++) {
+            if (cache[i].bottom >= scrollBottom) {
+              const index = Math.min(i - (remain / 2 | 0), total - remain)
+              this.style.paddingTop = cache[index].top
+              this.start = index
+              break
             }
           }
         }
       }
-      resetUp()
-      resetDown()
-    },
+      /**
+       * 向上滚动很久后忽然再向下再停止就会按照是向下滚动去修复了
+       * 所以这里只能对上下都进行修复
+       */
+      adjustUp()
+      adjustDown()
+    }),
     _computeRenderHeight(items, offset) {
       const { height, isSameHeight, total, column, cache, isSingleColumn } = this
       if (!total) {
@@ -225,7 +287,7 @@ export default {
           let offsets
           if (offset) {
             offsets = []
-            for (let i = offset - column; i <= offset - 1; i++) {
+            for (let i = offset - column, end = offset - 1; i <= end; i++) {
               offsets.push(cache[i].bottom)
             }
           } else {
