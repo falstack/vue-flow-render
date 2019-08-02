@@ -71,12 +71,6 @@ export default {
     this.setWrap()
     this._computeRenderHeight(this.$slots.default, 0)
   },
-  beforeUpdate() {
-    /**
-     * 这个地方得加，外界环境比较复杂
-     */
-    this._adjustStart()
-  },
   methods: {
     setOffset() {
       this.offsetTop = this.$el.offsetTop
@@ -99,17 +93,17 @@ export default {
         return
       }
       /**
+       * 实际的滚动的高度要减去 offset
+       */
+      const scrollTop = offset - offsetTop
+      /**
        * 位移修正（iOS offset 可能为负值）
        */
-      if (offset - offsetTop <= 0) {
+      if (scrollTop <= 0) {
         this.start = 0
         this.style.paddingTop = 0
         return
       }
-      /**
-       * 实际的滚动的高度要减去 offset
-       */
-      const scrollTop = offset - offsetTop
       /**
        * 向上
        */
@@ -162,13 +156,26 @@ export default {
         paddingTop: 0
       }
       this.cache = {}
+      this.start = 0
     },
     _adjustStart: debounce(100, function() {
       const { lastScrollTop, cache, start, isSameHeight, height, remain, column, offsetTop, total, wrapHeight } = this
       /**
-       * 如果数据量少则不需要修正
+       * 如果在顶部，则直接修正
        */
-      if (remain >= total) {
+      const scrollTop = lastScrollTop - offsetTop
+      if (scrollTop <= 0) {
+        this.style.paddingTop = 0
+        this.start = 0
+        return
+      }
+      /**
+       * 如果触底了，则直接修正
+       */
+      const scrollBottom = lastScrollTop - offsetTop + wrapHeight
+      if (scrollBottom >= cache[total - 1].bottom) {
+        this.start = total - remain
+        this.style.paddingTop = cache[total - remain].top
         return
       }
       /**
@@ -176,15 +183,6 @@ export default {
        */
       const adjustUp = () => {
         const detectRect = cache[start]
-        const scrollTop = lastScrollTop - offsetTop
-        /**
-         * 如果在顶部，则直接修正
-         */
-        if (scrollTop === 0) {
-          this.style.paddingTop = 0
-          this.start = 0
-          return
-        }
         const deltaHeight = detectRect.top - scrollTop
         /**
          * 如果当前列表的第一个元素的顶部在视口的上方，则不用修正
@@ -220,19 +218,10 @@ export default {
        */
       const adjustDown = () => {
         const detectRect = cache[start + remain - 1]
-        const scrollBottom = lastScrollTop - offsetTop + wrapHeight
-        /**
-         * 如果触底了，则直接修正
-         */
-        if (scrollBottom === cache[total - 1].bottom) {
-          this.start = total - remain
-          this.style.paddingTop = cache[total - remain].top
-          return
-        }
+        const deltaHeight = detectRect.bottom - scrollBottom
         /**
          * 如果当前列表的最后一个元素的底部在视口的下方，则不用修正
          */
-        const deltaHeight = detectRect.bottom - scrollBottom
         if (deltaHeight >= 0) {
           return
         }
