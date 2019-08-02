@@ -71,6 +71,12 @@ export default {
     this.setWrap()
     this._computeRenderHeight(this.$slots.default, 0)
   },
+  beforeUpdate() {
+    /**
+     * 这个地方得加，外界环境比较复杂
+     */
+    this._adjustStart()
+  },
   methods: {
     setOffset() {
       this.offsetTop = this.$el.offsetTop
