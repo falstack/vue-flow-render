@@ -2,7 +2,7 @@
 
 一个 vue 的列表惰性渲染容器组件
 
-## how it work
+## How it works
 1. 单列定高
 <img src="./demo/single-height.gif" />
 2. 单列不定高
@@ -10,21 +10,19 @@
 3. 多列不定高（瀑布流）
 <img src="./demo/multiple.gif" />
 
-## download
+## Download
 ```shell
 yarn add vue-flow-render
-```
 or
-```shell
 npm install vue-flow-render
 ```
 
-## usage
+## Usage
 ```javascript
 import VueFlowRender from 'vue-flow-render'
 ```
 
-## 参数
+## Props
 | key | value | description | required | validator |
 | ------ | ------ | ------ | ------ | --- |
 | remain | Number | 列表里保留的 item 的 DOM 个数 | Y | >= 0 |
@@ -50,7 +48,7 @@ import VueFlowRender from 'vue-flow-render'
 </vue-flow-render>
 ```
 
-## 方法
+## Public methods
 > 通过 ref 来拿到组件，然后调用组件的方法
 1. `this.$refs.render.scroll(scrollEvt.target.offsetTop)`
 组件不会自己滚动，需要在外层容器滚动的时候将`evt.target.offsetTop`传递到 scroll 函数里
@@ -67,3 +65,9 @@ scroll 函数的第二个参数是 isUp（是否向上滑动，默认可不传�
 
 5. `this.$refs.render.clear()`
 刷新页面的时候，调用该方法清空缓存
+
+## Contributions
+Welcome to improve this vue component with any issue, pull request or code review!
+
+## License
+[MIT](https://github.com/falstack/vue-flow-render/blob/master/LICENSE)
