@@ -1,3 +1,5 @@
+import { debounce } from 'throttle-debounce'
+
 export default {
   name: 'VueFlowRender',
   props: {
@@ -28,9 +30,8 @@ export default {
       default: () => {}
     }
   },
-  data() {
+  data () {
     return {
-      wrap: null,
       wrapHeight: 0,
       offsetTop: 0,
       lastScrollTop: 0,
@@ -44,15 +45,15 @@ export default {
     }
   },
   computed: {
-    isSameHeight() {
+    isSameHeight () {
       return this.height !== 0
     },
-    isSingleColumn() {
+    isSingleColumn () {
       return this.column === 1
     }
   },
   watch: {
-    total(newVal, oldVal) {
+    total (newVal, oldVal) {
       if (!newVal) {
         this.clear()
       } else if (newVal < oldVal) {
@@ -61,29 +62,24 @@ export default {
       } else {
         this._computeRenderHeight(this.isSameHeight ? undefined : this.$slots.default.slice(oldVal, newVal), oldVal)
       }
-      this.wrapHeight = this.wrap.clientHeight
     }
   },
-  mounted() {
+  mounted () {
     this.setOffset()
     this.setWrap()
     this._computeRenderHeight(this.$slots.default, 0)
   },
-  beforeUpdate() {
-    this._adjustStart()
-  },
   methods: {
-    setOffset() {
+    setOffset () {
       this.offsetTop = this.$el.offsetTop
     },
-    setWrap(el) {
-      this.wrap = el || this.$el.parentElement
-      this.wrapHeight = this.wrap.clientHeight
+    setWrap (el) {
+      this.wrapHeight = (el || this.$el.parentElement).clientHeight
     },
-    getRect(index) {
+    getRect (index) {
       return this.cache[index]
     },
-    scroll(offset, up) {
+    scroll (offset, up) {
       this.isUp = up === undefined ? offset < this.lastScrollTop : up
       this.lastScrollTop = offset
       const { start, remain, cache, offsetTop, isUp, total, wrapHeight } = this
@@ -149,8 +145,9 @@ export default {
           this.start++
         }
       }
+      this._adjustStart()
     },
-    clear() {
+    clear () {
       this.style = {
         height: 0,
         paddingTop: 0
@@ -158,7 +155,7 @@ export default {
       this.cache = {}
       this.start = 0
     },
-    _adjustStart() {
+    _adjustStart: debounce(100, function () {
       const { lastScrollTop, cache, start, isSameHeight, height, remain, column, offsetTop, total, wrapHeight } = this
       /**
        * 元素比较少，还不需要懒加载
@@ -178,7 +175,7 @@ export default {
       /**
        * 如果触底了，则直接修正
        */
-      const scrollBottom = lastScrollTop - offsetTop + wrapHeight
+      const scrollBottom = scrollTop + wrapHeight
       if (scrollBottom >= cache[total - 1].bottom) {
         this.start = total - remain
         this.style.paddingTop = cache[total - remain].top
@@ -260,8 +257,8 @@ export default {
        */
       adjustUp()
       adjustDown()
-    },
-    _computeRenderHeight(items, offset) {
+    }),
+    _computeRenderHeight (items, offset) {
       const { height, isSameHeight, total, column, cache, isSingleColumn } = this
       if (!total) {
         return
@@ -315,7 +312,7 @@ export default {
         }
       }
     },
-    _filter(h) {
+    _filter (h) {
       const { remain, total, start, item, getter } = this
       const end = remain >= total ? total : start + remain
 
@@ -333,7 +330,7 @@ export default {
       return this.$slots.default.slice(start, end)
     }
   },
-  render: function(h) {
+  render: function (h) {
     const { paddingTop, height } = this.style
     const list = this._filter(h)
 
