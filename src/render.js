@@ -1,5 +1,3 @@
-import { debounce } from 'throttle-debounce'
-
 export default {
   name: 'VueFlowRender',
   props: {
@@ -70,6 +68,9 @@ export default {
     this.setOffset()
     this.setWrap()
     this._computeRenderHeight(this.$slots.default, 0)
+  },
+  beforeUpdate() {
+    this._adjustStart()
   },
   methods: {
     setOffset() {
@@ -148,7 +149,6 @@ export default {
           this.start++
         }
       }
-      this._adjustStart()
     },
     clear() {
       this.style = {
@@ -158,8 +158,14 @@ export default {
       this.cache = {}
       this.start = 0
     },
-    _adjustStart: debounce(100, function() {
+    _adjustStart() {
       const { lastScrollTop, cache, start, isSameHeight, height, remain, column, offsetTop, total, wrapHeight } = this
+      /**
+       * 元素比较少，还不需要懒加载
+       */
+      if (remain >= total) {
+        return
+      }
       /**
        * 如果在顶部，则直接修正
        */
@@ -254,7 +260,7 @@ export default {
        */
       adjustUp()
       adjustDown()
-    }),
+    },
     _computeRenderHeight(items, offset) {
       const { height, isSameHeight, total, column, cache, isSingleColumn } = this
       if (!total) {
