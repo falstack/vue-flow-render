@@ -1,5 +1,3 @@
-import { debounce } from 'throttle-debounce'
-
 const getWrapElement = dom => {
   let el = dom
   while (
@@ -85,6 +83,9 @@ export default {
     this.setWrap()
     this._computeRenderHeight(this.$slots.default, 0)
   },
+  beforeUpdate () {
+    this._adjustStart()
+  },
   methods: {
     setOffset () {
       this.offsetTop = this.$el.offsetTop
@@ -161,7 +162,6 @@ export default {
           this.start++
         }
       }
-      this._adjustStart()
     },
     clear () {
       this.style = {
@@ -171,7 +171,7 @@ export default {
       this.cache = {}
       this.start = 0
     },
-    _adjustStart: debounce(100, function () {
+    _adjustStart () {
       const { lastScrollTop, cache, start, isSameHeight, height, remain, column, offsetTop, total, wrapHeight } = this
       /**
        * 元素比较少，还不需要懒加载
@@ -273,7 +273,7 @@ export default {
        */
       adjustUp()
       adjustDown()
-    }),
+    },
     _computeRenderHeight (items, offset) {
       const { height, isSameHeight, total, column, cache, isSingleColumn } = this
       if (!total) {

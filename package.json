@@ -1,6 +1,6 @@
 {
   "name": "vue-flow-render",
-  "version": "0.1.38",
+  "version": "0.1.39",
   "main": "dist/vue-flow-render.umd.min.js",
   "files": [
     "dist"
@@ -43,7 +43,6 @@
     "node-sass": "^4.12.0",
     "postcss-px-to-viewport": "^1.1.1",
     "sass-loader": "^7.1.0",
-    "throttle-debounce": "^2.1.0",
     "vue-router": "^3.0.7",
     "vue-template-compiler": "^2.6.10"
   }
