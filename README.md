@@ -3,11 +3,14 @@
 一个 vue 的列表惰性渲染容器组件
 
 ## How it works
-1. 单列定高
+
+#### 单列定高
 <img src="./demo/single-height.gif" />
-2. 单列不定高
+
+#### 单列不定高
 <img src="./demo/single.gif" />
-3. 多列不定高（瀑布流）
+
+#### 多列不定高（瀑布流）
 <img src="./demo/multiple.gif" />
 
 ## Download
