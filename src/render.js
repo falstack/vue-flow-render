@@ -1,5 +1,22 @@
 import { debounce } from 'throttle-debounce'
 
+const getWrapElement = dom => {
+  let el = dom
+  while (
+    el &&
+    el.tagName !== 'HTML' &&
+    el.nodeType === 1
+  ) {
+    const overflowY = window.getComputedStyle(el).overflowY
+    const overflow = window.getComputedStyle(el).overflow
+    if (overflowY === 'hidden' || overflow === 'hidden') {
+      return el
+    }
+    el = el.parentNode
+  }
+  return dom.parentNode
+}
+
 export default {
   name: 'VueFlowRender',
   props: {
@@ -35,7 +52,6 @@ export default {
       wrapHeight: 0,
       offsetTop: 0,
       lastScrollTop: 0,
-      isUp: false,
       start: 0,
       style: {
         height: 0,
@@ -74,15 +90,15 @@ export default {
       this.offsetTop = this.$el.offsetTop
     },
     setWrap (el) {
-      this.wrapHeight = (el || this.$el.parentElement).clientHeight
+      this.wrapHeight = (el || getWrapElement(this.$el)).clientHeight
     },
     getRect (index) {
       return this.cache[index]
     },
     scroll (offset, up) {
-      this.isUp = up === undefined ? offset < this.lastScrollTop : up
+      const isUp = up === undefined ? offset < this.lastScrollTop : up
       this.lastScrollTop = offset
-      const { start, remain, cache, offsetTop, isUp, total, wrapHeight } = this
+      const { start, remain, cache, offsetTop, total, wrapHeight } = this
       /**
        * 元素比较少，还不需要懒加载
        */
