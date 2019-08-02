@@ -166,6 +166,12 @@ export default {
     _adjustStart: debounce(100, function() {
       const { lastScrollTop, cache, start, isSameHeight, height, remain, column, offsetTop, total, wrapHeight } = this
       /**
+       * 如果数据量少则不需要修正
+       */
+      if (remain >= total) {
+        return
+      }
+      /**
        * 向上修正
        */
       const adjustUp = () => {
