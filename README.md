@@ -53,20 +53,19 @@ import VueFlowRender from 'vue-flow-render'
 
 ## Public methods
 > 通过 ref 来拿到组件，然后调用组件的方法
-1. `this.$refs.render.scroll(scrollEvt.target.offsetTop)`
-组件不会自己滚动，需要在外层容器滚动的时候将`evt.target.offsetTop`传递到 scroll 函数里
-scroll 函数的第二个参数是 isUp（是否向上滑动，默认可不传）
+1. `scroll(scrollEvt.target.offsetTop)`
+组件不会自己滚动，需要在外层容器滚动的时候将`evt.target.offsetTop`传递到 scroll 函数里的第二个参数是 isUp（是否向上滑动，默认可不传）
 
-2. `this.$refs.render.setOffset()`
+2. `setOffset()`
 如果容器的上面存在动态高度的元素，那么当其高度变化后，调用`setOffset`函数
 
-3. `this.$refs.render.setWrap(el)`
+3. `setWrap(el)`
 如果使用`better-scroll`，那么你要把 render 的 wrap 设置为`better-scroll`的父容器。默认为组件外层 overflow：hidden 的第一个元素
 
-4. `this.$refs.render.getRect(index)`
+4. `getRect(index)`
 使用这个组件后，浏览器自带的`Ctrl + F`搜索就无法正常使用，请自行实现搜索功能，然后通过该方法获取到指定元素的 rect，再让容器滚动到指定位置
 
-5. `this.$refs.render.clear()`
+5. `clear()`
 刷新页面的时候，调用该方法清空缓存
 
 ## Contributions
