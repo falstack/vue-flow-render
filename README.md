@@ -5,13 +5,13 @@
 ## How it works
 
 #### 单列定高
-<img src="./demo/single-height.gif" />
+<img src="https://github.com/falstack/vue-flow-render/raw/master/demo/single-height.gif" />
 
 #### 单列不定高
-<img src="./demo/single.gif" />
+<img src="https://github.com/falstack/vue-flow-render/raw/master/demo/single.gif" />
 
-#### 多列不定高（瀑布流）
-<img src="./demo/multiple.gif" />
+#### 多列不定高（waterfall）
+<img src="https://github.com/falstack/vue-flow-render/raw/master/demo/multiple.gif" />
 
 ## Download
 ```shell
