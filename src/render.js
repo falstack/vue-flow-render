@@ -99,7 +99,7 @@ export default {
     scroll (offset, up) {
       const isUp = up === undefined ? offset < this.lastScrollTop : up
       this.lastScrollTop = offset
-      const { start, remain, cache, offsetTop, total, wrapHeight } = this
+      const { start, remain, cache, total } = this
       /**
        * 元素比较少，还不需要懒加载
        */
@@ -109,7 +109,7 @@ export default {
       /**
        * 实际的滚动的高度要减去 offset
        */
-      const scrollTop = offset - offsetTop
+      const scrollTop = offset - this.offsetTop
       /**
        * 位移修正（iOS offset 可能为负值）
        */
@@ -135,7 +135,7 @@ export default {
          * 2. 当前列表的第一个元素的顶部已经进入视口
          */
         if (
-          cache[start + remain - 1].top > scrollTop + wrapHeight ||
+          cache[start + remain - 1].top > scrollTop + this.wrapHeight ||
           cache[start].top > scrollTop
         ) {
           this.style.paddingTop -= cache[start - 1].height
@@ -156,7 +156,7 @@ export default {
          */
         if (
           cache[start].bottom < scrollTop ||
-          cache[start + remain - 1].bottom < scrollTop + wrapHeight
+          cache[start + remain - 1].bottom < scrollTop + this.wrapHeight
         ) {
           this.style.paddingTop += cache[start].height
           this.start++
@@ -168,11 +168,11 @@ export default {
         height: 0,
         paddingTop: 0
       }
-      this.cache = {}
       this.start = 0
+      this.cache = {}
     },
     _adjustStart () {
-      const { lastScrollTop, cache, start, isSameHeight, height, remain, column, offsetTop, total, wrapHeight } = this
+      const { cache, start, remain, total } = this
       /**
        * 元素比较少，还不需要懒加载
        */
@@ -182,7 +182,7 @@ export default {
       /**
        * 如果在顶部，则直接修正
        */
-      const scrollTop = lastScrollTop - offsetTop
+      const scrollTop = this.lastScrollTop - this.offsetTop
       if (scrollTop <= 0) {
         this.style.paddingTop = 0
         this.start = 0
@@ -191,12 +191,14 @@ export default {
       /**
        * 如果触底了，则直接修正
        */
-      const scrollBottom = scrollTop + wrapHeight
+      const scrollBottom = scrollTop + this.wrapHeight
       if (scrollBottom >= cache[total - 1].bottom) {
         this.start = total - remain
         this.style.paddingTop = cache[total - remain].top
         return
       }
+
+      const { isSameHeight, column, height } = this
       /**
        * 向上修正
        */
@@ -219,7 +221,7 @@ export default {
         } else {
           /**
            * 如果元素不等高
-           * 从当前列表的上一个元素开始，到第 0 个元素结束开始循环
+           * 从当前列表的上一个元素开始，到第 0 个元素结束
            * 寻找第一个顶部在视口边界的元素
            */
           for (let i = start - 1; i >= 0; i--) {
@@ -254,7 +256,7 @@ export default {
         } else {
           /**
            * 如果元素不等高
-           * 从最后一个元素的下一个元素开始，到最后一个元素开始循环
+           * 从当前列表的最后一个元素的下一个元素开始，到最后一个元素结束
            * 寻找第一个底部在视口边界的元素
            */
           for (let i = start + remain; i < total; i++) {
@@ -275,11 +277,12 @@ export default {
       adjustDown()
     },
     _computeRenderHeight (items, offset) {
-      const { height, isSameHeight, total, column, cache, isSingleColumn } = this
+      const { total, column, cache } = this
       if (!total) {
         return
       }
-      if (isSameHeight) {
+      if (this.isSameHeight) {
+        const height = this.height
         const end = items ? items.length : total - offset
         for (let i = 0; i < end; i++) {
           const top = height * Math.floor((i + offset) / column)
@@ -291,10 +294,10 @@ export default {
         }
         this.style.height = height * total / column
       } else {
-        if (isSingleColumn) {
+        if (this.isSingleColumn) {
           let beforeHeight = offset ? cache[offset - 1].bottom : 0
           items.forEach((item, index) => {
-            const hgt = +item.data.style.height.replace('px', '')
+            const hgt = parseInt(item.data.style.height, 10)
             cache[index + offset] = {
               height: hgt,
               top: beforeHeight,
@@ -316,7 +319,7 @@ export default {
           items.forEach((item, index) => {
             const realIndex = index + offset
             const beforeHeight = Math.min(...offsets)
-            const hgt = +item.data.style.height.replace('px', '')
+            const hgt = parseInt(item.data.style.height, 10)
             cache[realIndex] = {
               height: hgt,
               top: beforeHeight,
@@ -329,13 +332,13 @@ export default {
       }
     },
     _filter (h) {
-      const { remain, total, start, item, getter } = this
+      const { remain, total, start, item } = this
       const end = remain >= total ? total : start + remain
 
       if (item) {
         const result = []
         for (let i = start; i < end; i++) {
-          result.push(h(item, getter(i)))
+          result.push(h(item, this.getter(i)))
         }
         return result
       }
@@ -347,17 +350,14 @@ export default {
     }
   },
   render: function (h) {
-    const { paddingTop, height } = this.style
-    const list = this._filter(h)
-
     return h('div', {
       'style': {
         boxSizing: 'border-box',
-        height: `${height}px`,
-        paddingTop: `${paddingTop}px`,
-        willChange: 'padding-top'
+        willChange: 'padding-top',
+        paddingTop: `${this.style.paddingTop}px`,
+        height: `${this.style.height}px`
       },
       'class': 'vue-flow-render'
-    }, list)
+    }, this._filter(h))
   }
 }
