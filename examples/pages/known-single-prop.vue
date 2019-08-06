@@ -57,7 +57,7 @@
 import Item from '../Item'
 
 export default {
-  name: 'UnknownSingle',
+  name: 'KnownSingleProp',
   data() {
     return {
       items: this.$factory.get(1000),

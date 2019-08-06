@@ -46,6 +46,7 @@
       ref="render"
       :total="1000"
       :remain="10"
+      :height="100"
     >
       <div
         v-for="(item, index) in items"
@@ -65,7 +66,7 @@
 import Item from '../Item'
 
 export default {
-  name: 'UnknownSingle',
+  name: 'KnownSingleFor',
   data() {
     return {
       items: this.$factory.get(1000),

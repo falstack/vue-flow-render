@@ -51,10 +51,8 @@ export default {
       offsetTop: 0,
       lastScrollTop: 0,
       start: 0,
-      style: {
-        height: 0,
-        paddingTop: 0
-      },
+      flowHeight: 0,
+      paddingTop: 0,
       cache: {}
     }
   },
@@ -115,7 +113,7 @@ export default {
        */
       if (scrollTop <= 0) {
         this.start = 0
-        this.style.paddingTop = 0
+        this.paddingTop = 0
         return
       }
       /**
@@ -126,7 +124,7 @@ export default {
          * 触顶，数值修正
          */
         if (this.start <= 0) {
-          this.style.paddingTop = 0
+          this.paddingTop = 0
           this.start = 0
           return
         }
@@ -138,7 +136,7 @@ export default {
           cache[start + remain - 1].top > scrollTop + this.wrapHeight ||
           cache[start].top > scrollTop
         ) {
-          this.style.paddingTop -= cache[start - 1].height
+          this.paddingTop -= cache[start - 1].height
           this.start--
         }
       } else {
@@ -147,7 +145,7 @@ export default {
          */
         if (start + remain >= total) {
           this.start = total - remain
-          this.style.paddingTop = cache[total - remain].top
+          this.paddingTop = cache[total - remain].top
           return
         }
         /**
@@ -158,16 +156,14 @@ export default {
           cache[start].bottom < scrollTop ||
           cache[start + remain - 1].bottom < scrollTop + this.wrapHeight
         ) {
-          this.style.paddingTop += cache[start].height
+          this.paddingTop += cache[start].height
           this.start++
         }
       }
     },
     clear () {
-      this.style = {
-        height: 0,
-        paddingTop: 0
-      }
+      this.flowHeight = 0
+      this.paddingTop = 0
       this.start = 0
       this.cache = {}
     },
@@ -184,7 +180,7 @@ export default {
        */
       const scrollTop = this.lastScrollTop - this.offsetTop
       if (scrollTop <= 0) {
-        this.style.paddingTop = 0
+        this.paddingTop = 0
         this.start = 0
         return
       }
@@ -194,7 +190,7 @@ export default {
       const scrollBottom = scrollTop + this.wrapHeight
       if (scrollBottom >= cache[total - 1].bottom) {
         this.start = total - remain
-        this.style.paddingTop = cache[total - remain].top
+        this.paddingTop = cache[total - remain].top
         return
       }
 
@@ -217,7 +213,7 @@ export default {
            */
           const decreaseCount = Math.abs(Math.ceil(deltaHeight / height / column))
           this.start -= decreaseCount
-          this.style.paddingTop -= decreaseCount * height
+          this.paddingTop -= decreaseCount * height
         } else {
           /**
            * 如果元素不等高
@@ -226,9 +222,8 @@ export default {
            */
           for (let i = start - 1; i >= 0; i--) {
             if (cache[i].top <= scrollTop) {
-              const index = Math.max(i - (remain / 2 | 0), 0)
-              this.style.paddingTop = cache[index].top
-              this.start = index
+              this.paddingTop = cache[i].top
+              this.start = i
               break
             }
           }
@@ -252,7 +247,7 @@ export default {
            */
           const increaseCount = Math.abs(Math.floor(deltaHeight / height / column))
           this.start += increaseCount
-          this.style.paddingTop += increaseCount * height
+          this.paddingTop += increaseCount * height
         } else {
           /**
            * 如果元素不等高
@@ -261,9 +256,8 @@ export default {
            */
           for (let i = start + remain; i < total; i++) {
             if (cache[i].bottom >= scrollBottom) {
-              const index = Math.min(i - (remain / 2 | 0), total - remain)
-              this.style.paddingTop = cache[index].top
-              this.start = index
+              this.paddingTop = cache[i - remain].top
+              this.start = i - remain
               break
             }
           }
@@ -292,7 +286,7 @@ export default {
             bottom: height + top
           }
         }
-        this.style.height = height * total / column
+        this.flowHeight = height * total / column
       } else {
         if (this.isSingleColumn) {
           let beforeHeight = offset ? cache[offset - 1].bottom : 0
@@ -305,7 +299,7 @@ export default {
             }
             beforeHeight += hgt
           })
-          this.style.height = beforeHeight
+          this.flowHeight = beforeHeight
         } else {
           let offsets
           if (offset) {
@@ -327,7 +321,7 @@ export default {
             }
             offsets[offsets.indexOf(beforeHeight)] += hgt
           })
-          this.style.height = Math.max(...offsets)
+          this.flowHeight = Math.max(...offsets)
         }
       }
     },
@@ -354,8 +348,8 @@ export default {
       'style': {
         boxSizing: 'border-box',
         willChange: 'padding-top',
-        paddingTop: `${this.style.paddingTop}px`,
-        height: `${this.style.height}px`
+        paddingTop: `${this.paddingTop}px`,
+        height: `${this.flowHeight}px`
       },
       'class': 'vue-flow-render'
     }, this._filter(h))
