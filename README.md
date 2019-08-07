@@ -37,6 +37,8 @@ import VueFlowRender from 'vue-flow-render'
 
 
 > PS：如果 item 的高度为不固定的，必须在 item 的 style 上设置高度，单位为 px，如：
+
+1. 普通用法
 ```Vue
 <vue-flow-render
   ref="render"
@@ -49,6 +51,42 @@ import VueFlowRender from 'vue-flow-render'
     :style="{ height: `${item.height}px` }"
   />
 </vue-flow-render>
+```
+
+2. item 用法
+```vue
+<template>
+    <vue-flow-render
+      ref="render"
+      :total="1000"
+      :remain="10"
+      :height="100"
+      :item="item"
+      :getter="getProps"
+    />
+</template>
+
+<script>
+import Item from './components/Item.vue'
+
+export default {
+  data() {
+    return {
+      item: Item
+    }
+  },
+  methods: {
+    getProps(index) {
+      return {
+        props: {
+          item: this.items[index],
+          index
+        }
+      }
+    }
+  }
+}
+</script>
 ```
 
 ## Public methods
