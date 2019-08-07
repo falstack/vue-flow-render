@@ -72,6 +72,7 @@ import Item from './components/Item.vue'
 export default {
   data() {
     return {
+      items: [],
       item: Item
     }
   },
