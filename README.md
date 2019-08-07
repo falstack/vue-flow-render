@@ -56,14 +56,14 @@ import VueFlowRender from 'vue-flow-render'
 2. item 用法
 ```vue
 <template>
-    <vue-flow-render
-      ref="render"
-      :total="1000"
-      :remain="10"
-      :height="100"
-      :item="item"
-      :getter="getProps"
-    />
+  <vue-flow-render
+    ref="render"
+    :total="1000"
+    :remain="10"
+    :height="100"
+    :item="item"
+    :getter="getProps"
+  />
 </template>
 
 <script>
