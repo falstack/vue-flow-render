@@ -74,6 +74,7 @@ export default {
       } else {
         this._computeRenderHeight(this.isSameHeight ? undefined : this.$slots.default.slice(oldVal, newVal), oldVal)
       }
+      this._adjustStart()
     }
   },
   mounted () {
@@ -256,8 +257,9 @@ export default {
            */
           for (let i = start + remain; i < total; i++) {
             if (cache[i].bottom >= scrollBottom) {
-              this.paddingTop = cache[i - remain].top
-              this.start = i - remain
+              const index = i - remain + 1
+              this.paddingTop = cache[index].top
+              this.start = index
               break
             }
           }
