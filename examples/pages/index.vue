@@ -15,6 +15,9 @@
     <router-link to="/unknown-multiple">
       <p>多列不定高度（瀑布流）</p>
     </router-link>
+    <router-link to="/performance">
+      <p>性能测试</p>
+    </router-link>
   </div>
 </template>
 

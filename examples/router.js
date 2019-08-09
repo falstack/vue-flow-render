@@ -30,6 +30,11 @@ export default new VueRouter({
       path: '/unknown-multiple',
       name: 'unknown-multiple',
       component: () => import('./pages/unknown-multiple')
+    },
+    {
+      path: '/performance',
+      name: 'performance',
+      component: () => import('./pages/performance')
     }
   ]
 })
