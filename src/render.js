@@ -34,7 +34,8 @@ export default {
     },
     total: {
       type: Number,
-      required: true
+      required: true,
+      default: 0
     },
     item: {
       type: Object,
@@ -213,25 +214,37 @@ export default {
       }
       if (this.isSameHeight) {
         const height = this.height
-        const end = items ? items.length : total - offset
-        for (let i = 0; i < end; i++) {
-          const top = height * Math.floor((i + offset) / column)
-          cache[i + offset] = {
-            height,
-            top,
-            bottom: height + top
+        const end = items ? items.length + offset : total
+        if (this.isSingleColumn) {
+          for (let i = offset; i < end; i++) {
+            const top = height * Math.floor(i / column)
+            cache[i] = {
+              top,
+              height,
+              bottom: height + top
+            }
           }
+          this.flowHeight = height * Math.ceil(total / column)
+        } else {
+          for (let i = offset; i < end; i++) {
+            const top = height * i
+            cache[i] = {
+              top,
+              height,
+              bottom: height + top
+            }
+          }
+          this.flowHeight = height * total
         }
-        this.flowHeight = height * total / column
       } else {
         if (this.isSingleColumn) {
           let beforeHeight = offset ? cache[offset - 1].bottom : 0
           items.forEach((item, index) => {
             const hgt = parseInt(item.data.style.height, 10)
             cache[index + offset] = {
-              height: hgt,
               top: beforeHeight,
-              bottom: hgt + beforeHeight
+              bottom: hgt + beforeHeight,
+              height: hgt
             }
             beforeHeight += hgt
           })
@@ -247,13 +260,12 @@ export default {
             offsets = new Array(column).fill(0)
           }
           items.forEach((item, index) => {
-            const realIndex = index + offset
             const beforeHeight = Math.min(...offsets)
             const hgt = parseInt(item.data.style.height, 10)
-            cache[realIndex] = {
-              height: hgt,
+            cache[index + offset] = {
               top: beforeHeight,
-              bottom: hgt + beforeHeight
+              bottom: hgt + beforeHeight,
+              height: hgt
             }
             offsets[offsets.indexOf(beforeHeight)] += hgt
           })
