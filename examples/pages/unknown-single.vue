@@ -44,7 +44,7 @@
     <v-render
       ref="render"
       :total="1000"
-      :remain="10"
+      :remain="20"
     >
       <div
         v-for="(item, index) in items"

@@ -62,7 +62,7 @@
     <v-render
       ref="render"
       :total="1000"
-      :remain="16"
+      :remain="20"
       :column="2"
     >
       <div

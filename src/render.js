@@ -82,9 +82,6 @@ export default {
     this.setWrap()
     this._computeRenderHeight(this.$slots.default, 0)
   },
-  beforeUpdate () {
-    this._adjustStart()
-  },
   methods: {
     setOffset () {
       this.offsetTop = this.$el.offsetTop
@@ -96,79 +93,13 @@ export default {
       return this.cache[index]
     },
     scroll (offset, up) {
-      const isUp = up === undefined ? offset < this.lastScrollTop : up
-      this.lastScrollTop = offset
-      const { start, remain, cache, total } = this
-      /**
-       * 元素比较少，还不需要懒加载
-       */
-      if (remain >= total) {
-        return
-      }
-      /**
-       * 实际的滚动的高度要减去 offset
-       */
-      const scrollTop = offset - this.offsetTop
-      /**
-       * 位移修正（iOS offset 可能为负值）
-       */
-      if (scrollTop <= 0) {
-        this.start = 0
-        this.paddingTop = 0
-        return
-      }
-      /**
-       * 向上
-       */
-      if (isUp) {
-        /**
-         * 触顶，数值修正
-         */
-        if (this.start <= 0) {
-          this.paddingTop = 0
-          this.start = 0
-          return
-        }
-        /**
-         * 1. 当前列表最后一个元素的顶部已经离开视口
-         * 2. 当前列表的第一个元素的顶部已经进入视口
-         */
-        if (
-          cache[start + remain - 1].top > scrollTop + this.wrapHeight ||
-          cache[start].top > scrollTop
-        ) {
-          this.paddingTop -= cache[start - 1].height
-          this.start--
-        }
+      let isUp
+      if (up === undefined) {
+        isUp = offset < this.lastScrollTop
+        this.lastScrollTop = offset
       } else {
-        /**
-         * 触底，数值修正
-         */
-        if (start + remain >= total) {
-          this.start = total - remain
-          this.paddingTop = cache[total - remain].top
-          return
-        }
-        /**
-         * 1. 当前列表的第一个元素的底部已经离开视口
-         * 2. 当前列表的最后一个元素底部已经进入视口
-         */
-        if (
-          cache[start].bottom < scrollTop ||
-          cache[start + remain - 1].bottom < scrollTop + this.wrapHeight
-        ) {
-          this.paddingTop += cache[start].height
-          this.start++
-        }
+        isUp = up
       }
-    },
-    clear () {
-      this.flowHeight = 0
-      this.paddingTop = 0
-      this.start = 0
-      this.cache = {}
-    },
-    _adjustStart () {
       const { cache, start, remain, total } = this
       /**
        * 元素比较少，还不需要懒加载
@@ -179,7 +110,7 @@ export default {
       /**
        * 如果在顶部，则直接修正
        */
-      const scrollTop = this.lastScrollTop - this.offsetTop
+      const scrollTop = offset - this.offsetTop
       if (scrollTop <= 0) {
         this.paddingTop = 0
         this.start = 0
@@ -213,8 +144,9 @@ export default {
            * 如果元素是等高的，直接根据高度差算出需要修正的距离
            */
           const decreaseCount = Math.abs(Math.ceil(deltaHeight / height / column))
-          this.start -= decreaseCount
-          this.paddingTop -= decreaseCount * height
+          const index = Math.max((start - decreaseCount - remain / 2 | 0), 0)
+          this.start = index
+          this.paddingTop = cache[index].top
         } else {
           /**
            * 如果元素不等高
@@ -223,8 +155,9 @@ export default {
            */
           for (let i = start - 1; i >= 0; i--) {
             if (cache[i].top <= scrollTop) {
-              this.paddingTop = cache[i].top
-              this.start = i
+              const index = Math.max(i - remain / 2 | 0, 0)
+              this.paddingTop = cache[index].top
+              this.start = index
               break
             }
           }
@@ -247,8 +180,9 @@ export default {
            * 如果元素是等高的，直接根据高度差算出需要修正的距离
            */
           const increaseCount = Math.abs(Math.floor(deltaHeight / height / column))
-          this.start += increaseCount
-          this.paddingTop += increaseCount * height
+          const index = Math.min(start + increaseCount + remain / 2 | 0, total - remain)
+          this.start = index
+          this.paddingTop = cache[index].top
         } else {
           /**
            * 如果元素不等高
@@ -257,7 +191,7 @@ export default {
            */
           for (let i = start + remain; i < total; i++) {
             if (cache[i].bottom >= scrollBottom) {
-              const index = i - remain + 1
+              const index = Math.min(i + 1 - remain / 2 | 0, total - remain)
               this.paddingTop = cache[index].top
               this.start = index
               break
@@ -269,8 +203,13 @@ export default {
        * 向上滚动很久后忽然再向下再停止就会按照是向下滚动去修复了
        * 所以这里只能对上下都进行修复
        */
-      adjustUp()
-      adjustDown()
+      isUp ? adjustUp() : adjustDown()
+    },
+    clear () {
+      this.flowHeight = 0
+      this.paddingTop = 0
+      this.start = 0
+      this.cache = {}
     },
     _computeRenderHeight (items, offset) {
       const { total, column, cache } = this

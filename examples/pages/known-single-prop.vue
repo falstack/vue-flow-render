@@ -45,7 +45,7 @@
     <v-render
       ref="render"
       :total="1000"
-      :remain="10"
+      :remain="20"
       :height="100"
       :item="item"
       :getter="getProps"
