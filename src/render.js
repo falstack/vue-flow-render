@@ -74,7 +74,7 @@ export default {
       } else {
         this._computeRenderHeight(this.isSameHeight ? undefined : this.$slots.default.slice(oldVal, newVal), oldVal)
       }
-      this._adjustStart()
+      this.scroll(this.lastScrollTop, false)
     }
   },
   mounted () {
@@ -93,13 +93,8 @@ export default {
       return this.cache[index]
     },
     scroll (offset, up) {
-      let isUp
-      if (up === undefined) {
-        isUp = offset < this.lastScrollTop
-        this.lastScrollTop = offset
-      } else {
-        isUp = up
-      }
+      const isUp = up === undefined ? offset < this.lastScrollTop : up
+      this.lastScrollTop = offset
       const { cache, start, remain, total } = this
       /**
        * 元素比较少，还不需要懒加载

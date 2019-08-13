@@ -1,6 +1,6 @@
 {
   "name": "vue-flow-render",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "main": "dist/vue-flow-render.umd.min.js",
   "files": [
     "dist"
