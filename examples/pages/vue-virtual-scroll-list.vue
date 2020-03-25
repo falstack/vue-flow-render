@@ -1,5 +1,5 @@
 <style lang="scss">
-#foreach {
+#virtual-list {
   position: fixed;
   left: 0;
   top: 0;
@@ -7,14 +7,6 @@
   bottom: 0;
   padding-top: 15px;
   overflow: auto;
-  -webkit-overflow-scrolling: touch;
-
-  .banner {
-    width: 100%;
-    height: 200px;
-    background-color: cornflowerblue;
-    margin-bottom: 15px;
-  }
 
   .demo {
     box-sizing: border-box;
@@ -35,39 +27,26 @@
 </style>
 
 <template>
-  <div
-    id="foreach"
-    @scroll="handleScroll"
-  >
-    <!--
-    <div class="banner">
-      这里有一个banner卡位
-    </div>
-    -->
-    <v-render
-      ref="render"
-      :total="total"
-      :remain="20"
-      :height="100"
-    >
-      <div
-        v-for="(item, index) in items"
-        :key="index"
-        class="demo"
-      >
-        <div :style="{ backgroundColor: item.style.color }">
-          {{ index }}
-        </div>
-      </div>
-    </v-render>
+  <div id="virtual-list">
+    <virtual-list
+      :size="100"
+      :remain="10"
+      :item="item"
+      :itemcount="total"
+      :itemprops="getItemprops"
+    />
   </div>
 </template>
 
 <script>
+import VirtualList from 'vue-virtual-scroll-list'
 import Item from '../Item'
 
 export default {
-  name: 'KnownSingleFor',
+  name: 'VueVirtualScrollList',
+  components: {
+    VirtualList
+  },
   data() {
     const total = 100000
     return {
@@ -76,11 +55,12 @@ export default {
       item: Item
     }
   },
+  computed: {},
+  watch: {},
+  created() {},
+  mounted() {},
   methods: {
-    handleScroll(evt) {
-      this.$refs.render.scroll(evt.target.scrollTop)
-    },
-    getProps(index) {
+    getItemprops(index) {
       return {
         props: {
           item: this.items[index],

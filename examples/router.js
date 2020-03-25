@@ -32,9 +32,14 @@ export default new VueRouter({
       component: () => import('./pages/unknown-multiple')
     },
     {
-      path: '/performance',
-      name: 'performance',
-      component: () => import('./pages/performance')
+      path: '/vue-virtual-scroll-list',
+      name: 'vue-virtual-scroll-list',
+      component: () => import('./pages/vue-virtual-scroll-list')
+    },
+    {
+      path: '/normal-list',
+      name: 'normal-list',
+      component: () => import('./pages/normal.vue')
     }
   ]
 })

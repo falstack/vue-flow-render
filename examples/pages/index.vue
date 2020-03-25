@@ -15,8 +15,11 @@
     <router-link to="/unknown-multiple">
       <p>多列不定高度（瀑布流）</p>
     </router-link>
-    <router-link to="/performance">
-      <p>性能测试</p>
+    <router-link to="/vue-virtual-scroll-list">
+      <p>vue-virtual-scroll-list</p>
+    </router-link>
+    <router-link to="/normal-list">
+      <p>normal-list</p>
     </router-link>
   </div>
 </template>

@@ -38,12 +38,14 @@
     id="single"
     @scroll="handleScroll"
   >
+    <!--
     <div class="banner">
       这里有一个banner卡位
     </div>
+    -->
     <v-render
       ref="render"
-      :total="1000"
+      :total="total"
       :remain="20"
     >
       <div
@@ -64,8 +66,10 @@
 export default {
   name: 'UnknownSingle',
   data() {
+    const total = 100000
     return {
-      items: this.$factory.get(1000)
+      total,
+      items: this.$factory.get(total)
     }
   },
   methods: {

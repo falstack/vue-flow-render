@@ -61,7 +61,7 @@
   >
     <v-render
       ref="render"
-      :total="1000"
+      :total="total"
       :remain="20"
       :column="2"
     >
@@ -92,8 +92,10 @@
 export default {
   name: 'UnknownMultiple',
   data() {
+    const total = 100000
     return {
-      items: this.$factory.get(1000),
+      total,
+      items: this.$factory.get(total),
       width: (window.screen.width - 20) / 2 - 5,
       column: [0, 0],
       cache: {}
