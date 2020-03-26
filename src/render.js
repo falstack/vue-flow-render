@@ -195,10 +195,6 @@ export default {
           }
         }
       }
-      /**
-       * 向上滚动很久后忽然再向下再停止就会按照是向下滚动去修复了
-       * 所以这里只能对上下都进行修复
-       */
       isUp ? adjustUp() : adjustDown()
     },
     clear() {
