@@ -1,4 +1,4 @@
-const getWrapElement = dom => {
+const getWrapParent = dom => {
   let el = dom
   while (
     el &&
@@ -21,12 +21,12 @@ export default {
     column: {
       type: Number,
       default: 1,
-      validator: val => val >= 1
+      validator: (val) => val >= 1
     },
     height: {
       type: Number,
       default: 0,
-      validator: val => val >= 0
+      validator: (val) => val >= 0
     },
     remain: {
       type: Number,
@@ -46,7 +46,7 @@ export default {
       default: () => {}
     }
   },
-  data () {
+  data() {
     return {
       wrapHeight: 0,
       offsetTop: 0,
@@ -58,15 +58,15 @@ export default {
     }
   },
   computed: {
-    isSameHeight () {
+    isSameHeight() {
       return this.height !== 0
     },
-    isSingleColumn () {
+    isSingleColumn() {
       return this.column === 1
     }
   },
   watch: {
-    total (newVal, oldVal) {
+    total(newVal, oldVal) {
       if (!newVal) {
         this.clear()
       } else if (newVal < oldVal) {
@@ -78,22 +78,22 @@ export default {
       this.scroll(this.lastScrollTop, false)
     }
   },
-  mounted () {
+  mounted() {
     this.setOffset()
     this.setWrap()
     this._computeRenderHeight(this.$slots.default, 0)
   },
   methods: {
-    setOffset () {
+    setOffset() {
       this.offsetTop = this.$el.offsetTop
     },
-    setWrap (el) {
-      this.wrapHeight = (el || getWrapElement(this.$el)).clientHeight
+    setWrap(el) {
+      this.wrapHeight = (el || getWrapParent(this.$el)).clientHeight
     },
-    getRect (index) {
+    getRect(index) {
       return this.cache[index]
     },
-    scroll (offset, up) {
+    scroll(offset, up) {
       const isUp = up === undefined ? offset < this.lastScrollTop : up
       this.lastScrollTop = offset
       const { cache, start, remain, total } = this
@@ -140,7 +140,7 @@ export default {
            * 如果元素是等高的，直接根据高度差算出需要修正的距离
            */
           const decreaseCount = Math.abs(Math.ceil(deltaHeight / height / column))
-          const index = Math.max((start - decreaseCount - remain / 2 | 0), 0)
+          const index = Math.max((start - decreaseCount - remain / 2) | 0, 0)
           this.start = index
           this.paddingTop = cache[index].top
         } else {
@@ -151,7 +151,7 @@ export default {
            */
           for (let i = start - 1; i >= 0; i--) {
             if (cache[i].top <= scrollTop) {
-              const index = Math.max(i - remain / 2 | 0, 0)
+              const index = Math.max((i - remain / 2) | 0, 0)
               this.paddingTop = cache[index].top
               this.start = index
               break
@@ -176,7 +176,7 @@ export default {
            * 如果元素是等高的，直接根据高度差算出需要修正的距离
            */
           const increaseCount = Math.abs(Math.floor(deltaHeight / height / column))
-          const index = Math.min(start + increaseCount + remain / 2 | 0, total - remain)
+          const index = Math.min((start + increaseCount + remain / 2) | 0, total - remain)
           this.start = index
           this.paddingTop = cache[index].top
         } else {
@@ -187,7 +187,7 @@ export default {
            */
           for (let i = start + remain; i < total; i++) {
             if (cache[i].bottom >= scrollBottom) {
-              const index = Math.min(i + 1 - remain / 2 | 0, total - remain)
+              const index = Math.min((i + 1 - remain / 2) | 0, total - remain)
               this.paddingTop = cache[index].top
               this.start = index
               break
@@ -195,15 +195,19 @@ export default {
           }
         }
       }
+      /**
+       * 向上滚动很久后忽然再向下再停止就会按照是向下滚动去修复了
+       * 所以这里只能对上下都进行修复
+       */
       isUp ? adjustUp() : adjustDown()
     },
-    clear () {
+    clear() {
       this.flowHeight = 0
       this.paddingTop = 0
       this.start = 0
       this.cache = {}
     },
-    _computeRenderHeight (items, offset) {
+    _computeRenderHeight(items, offset) {
       const { total, column, cache } = this
       if (!total) {
         return
@@ -232,44 +236,42 @@ export default {
           }
           this.flowHeight = height * total
         }
-      } else {
-        if (this.isSingleColumn) {
-          let beforeHeight = offset ? cache[offset - 1].bottom : 0
-          items.forEach((item, index) => {
-            const hgt = parseInt(item.data.style.height, 10)
-            cache[index + offset] = {
-              top: beforeHeight,
-              bottom: hgt + beforeHeight,
-              height: hgt
-            }
-            beforeHeight += hgt
-          })
-          this.flowHeight = beforeHeight
-        } else {
-          let offsets
-          if (offset) {
-            offsets = []
-            for (let i = offset - column, end = offset - 1; i <= end; i++) {
-              offsets.push(cache[i].bottom)
-            }
-          } else {
-            offsets = new Array(column).fill(0)
+      } else if (this.isSingleColumn) {
+        let beforeHeight = offset ? cache[offset - 1].bottom : 0
+        items.forEach((item, index) => {
+          const hgt = parseInt(item.data.style.height, 10)
+          cache[index + offset] = {
+            top: beforeHeight,
+            bottom: hgt + beforeHeight,
+            height: hgt
           }
-          items.forEach((item, index) => {
-            const beforeHeight = Math.min(...offsets)
-            const hgt = parseInt(item.data.style.height, 10)
-            cache[index + offset] = {
-              top: beforeHeight,
-              bottom: hgt + beforeHeight,
-              height: hgt
-            }
-            offsets[offsets.indexOf(beforeHeight)] += hgt
-          })
-          this.flowHeight = Math.max(...offsets)
+          beforeHeight += hgt
+        })
+        this.flowHeight = beforeHeight
+      } else {
+        let offsets
+        if (offset) {
+          offsets = []
+          for (let i = offset - column, end = offset - 1; i <= end; i++) {
+            offsets.push(cache[i].bottom)
+          }
+        } else {
+          offsets = new Array(column).fill(0)
         }
+        items.forEach((item, index) => {
+          const beforeHeight = Math.min(...offsets)
+          const hgt = parseInt(item.data.style.height, 10)
+          cache[index + offset] = {
+            top: beforeHeight,
+            bottom: hgt + beforeHeight,
+            height: hgt
+          }
+          offsets[offsets.indexOf(beforeHeight)] += hgt
+        })
+        this.flowHeight = Math.max(...offsets)
       }
     },
-    _filter (h) {
+    _filter(h) {
       const { remain, total, start, item } = this
       const end = remain >= total ? total : start + remain
 
@@ -287,15 +289,20 @@ export default {
       return this.$slots.default.slice(start, end)
     }
   },
-  render: function (h) {
-    return h('div', {
-      'style': {
-        boxSizing: 'border-box',
-        willChange: 'padding-top',
-        paddingTop: `${this.paddingTop}px`,
-        height: `${this.flowHeight}px`
+  render(h) {
+    return h(
+      'div',
+      {
+        style: {
+          position: 'relative',
+          boxSizing: 'border-box',
+          willChange: 'padding-top',
+          paddingTop: `${this.paddingTop}px`,
+          height: `${this.flowHeight}px`
+        },
+        class: 'vue-flow-render'
       },
-      'class': 'vue-flow-render'
-    }, this._filter(h))
+      this._filter(h)
+    )
   }
 }
